@@ -1,0 +1,3037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Maths Is Easy!</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;600;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+/* ─────────────────────────────────────────
+   DESIGN TOKENS
+───────────────────────────────────────── */
+:root {
+  --bg:       #0e0120;
+  --surface:  #180230;
+  --card:     #1f0340;
+  --border:   rgba(140,60,220,.22);
+  --border2:  rgba(140,60,220,.45);
+
+  --p1: #3b0080; --p2: #5c10b0; --p3: #7e22ce;
+  --p4: #a855f7; --p5: #c084fc; --p6: #e9d5ff;
+
+  --gold:  #facc15; --gold2: #fbbf24;
+  --green: #22c55e; --green2: #4ade80;
+  --red:   #ef4444; --red2:   #f87171;
+  --sky:   #38bdf8; --rose:   #fb7185;
+
+  --op-add: #22c55e; --op-add-bg: rgba(34,197,94,.12);
+  --op-sub: #ef4444; --op-sub-bg: rgba(239,68,68,.12);
+  --op-mul: #facc15; --op-mul-bg: rgba(250,204,21,.12);
+  --op-div: #38bdf8; --op-div-bg: rgba(56,189,248,.12);
+
+  --rad: 18px; --rad-sm: 12px; --rad-lg: 26px;
+  --font-head: 'Baloo 2', cursive;
+  --font-body: 'Nunito', sans-serif;
+  --font-telugu: 'Noto Sans Telugu', 'Nirmala UI', sans-serif;
+  --shadow: 0 4px 24px rgba(0,0,0,.45);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: #f1e8ff;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ─────────────────────────────────────────
+   BG MESH
+───────────────────────────────────────── */
+.bg-mesh {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 50% at 15% 20%, rgba(88,28,220,.18) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 60% at 85% 80%, rgba(126,34,206,.14) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(30,0,70,.5) 0%, transparent 80%);
+}
+
+/* ─────────────────────────────────────────
+   LAYOUT
+───────────────────────────────────────── */
+#root { position: relative; z-index: 1; }
+
+/* ─────────────────────────────────────────
+   HOME SCREEN
+───────────────────────────────────────── */
+#home {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 52px 20px 80px; max-width: 680px; margin: 0 auto;
+}
+
+.home-logo {
+  font-family: var(--font-head);
+  font-size: clamp(2.8rem, 8vw, 5.2rem);
+  font-weight: 800;
+  line-height: 1;
+  text-align: center;
+  margin-bottom: 6px;
+  background: linear-gradient(135deg, #c084fc 0%, #facc15 45%, #c084fc 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 2px 20px rgba(192,132,252,.4));
+}
+.home-tagline {
+  font-size: .95rem; color: var(--p5); letter-spacing: .8px;
+  margin-bottom: 40px; text-align: center;
+}
+
+/* XP bar on home */
+.xp-row {
+  width: 100%; display: flex; align-items: center; gap: 12px;
+  margin-bottom: 36px;
+}
+.xp-bar-wrap {
+  flex: 1; height: 10px; background: rgba(255,255,255,.08);
+  border-radius: 99px; overflow: hidden;
+}
+.xp-bar-fill {
+  height: 100%; border-radius: 99px;
+  background: linear-gradient(90deg, var(--p3), var(--p4));
+  transition: width .6s cubic-bezier(.34,1.56,.64,1);
+}
+.xp-label { font-size: .78rem; color: var(--p5); white-space: nowrap; font-weight: 700; }
+
+/* section label */
+.section-lbl {
+  width: 100%; font-family: var(--font-head); font-size: 1rem; font-weight: 700;
+  color: var(--p5); text-transform: uppercase; letter-spacing: 1.5px;
+  margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+}
+.section-lbl::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* OP TILES */
+.op-grid {
+  width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+}
+
+.op-tile {
+  position: relative; cursor: pointer;
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: var(--rad-lg);
+  padding: 26px 20px 22px;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  transition: transform .15s, border-color .15s, box-shadow .15s;
+  overflow: hidden;
+  user-select: none;
+}
+.op-tile::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, var(--ac-bg, transparent) 0%, transparent 70%);
+  pointer-events: none;
+}
+.op-tile:hover { transform: translateY(-4px); border-color: var(--ac, var(--p3)); box-shadow: 0 8px 28px var(--ac-shadow, rgba(120,40,200,.3)); }
+.op-tile:active { transform: scale(.97); }
+
+.op-tile[data-op=add]{ --ac:var(--op-add); --ac-bg:var(--op-add-bg); --ac-shadow:rgba(34,197,94,.25); }
+.op-tile[data-op=sub]{ --ac:var(--op-sub); --ac-bg:var(--op-sub-bg); --ac-shadow:rgba(239,68,68,.25); }
+.op-tile[data-op=mul]{ --ac:var(--op-mul); --ac-bg:var(--op-mul-bg); --ac-shadow:rgba(250,204,21,.25); }
+.op-tile[data-op=div]{ --ac:var(--op-div); --ac-bg:var(--op-div-bg); --ac-shadow:rgba(56,189,248,.25); }
+
+.op-tile-sym {
+  font-family: var(--font-head); font-size: 3rem; font-weight: 800;
+  color: var(--ac, var(--p4)); line-height: 1;
+  filter: drop-shadow(0 0 10px var(--ac, var(--p4)));
+}
+.op-tile-name { font-family: var(--font-head); font-size: 1.25rem; font-weight: 700; color: #fff; }
+.op-tile-desc { font-size: .78rem; color: var(--p5); text-align: center; line-height: 1.4; }
+
+/* mastery stars */
+.op-tile-stars { display: flex; gap: 3px; }
+.star-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: rgba(255,255,255,.12); border: 1.5px solid rgba(255,255,255,.2);
+  transition: all .3s;
+}
+.star-dot.lit { background: var(--gold); border-color: var(--gold2); box-shadow: 0 0 6px var(--gold); }
+
+/* streak pill home */
+.home-stats {
+  display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+  margin-top: 28px; width: 100%;
+}
+.stat-chip {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 30px; padding: 8px 18px;
+  display: flex; align-items: center; gap: 7px;
+  font-family: var(--font-head); font-size: .95rem; font-weight: 700;
+}
+.stat-chip .ico { font-size: 1.2rem; }
+.stat-chip .val { color: var(--gold); }
+.stat-chip .lbl { color: var(--p5); font-size: .78rem; font-weight: 600; }
+
+/* ─────────────────────────────────────────
+   MODAL
+───────────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(6,0,20,.75);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  opacity: 0; pointer-events: none;
+  transition: opacity .22s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal-box {
+  background: var(--surface);
+  border: 1.5px solid var(--border2);
+  border-radius: 28px;
+  padding: 32px 28px 28px;
+  width: 100%; max-width: 460px;
+  transform: translateY(30px) scale(.96);
+  transition: transform .28s cubic-bezier(.34,1.56,.64,1);
+  box-shadow: 0 24px 80px rgba(0,0,0,.7);
+  position: relative;
+}
+.modal-overlay.open .modal-box { transform: translateY(0) scale(1); }
+
+.modal-close {
+  position: absolute; top: 14px; right: 16px;
+  background: rgba(255,255,255,.06); border: none; border-radius: 8px;
+  color: var(--p5); font-size: 1.1rem; width: 32px; height: 32px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background .15s;
+}
+.modal-close:hover { background: rgba(255,255,255,.12); }
+
+.modal-op-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 16px; border-radius: 30px;
+  font-family: var(--font-head); font-size: 1.1rem; font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.modal-section-lbl {
+  font-family: var(--font-head); font-size: .8rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1.2px;
+  color: var(--p5); margin-bottom: 10px;
+}
+
+/* Mode buttons in modal */
+.modal-modes { display: flex; flex-direction: column; gap: 9px; margin-bottom: 20px; }
+.modal-mode-btn {
+  display: flex; align-items: center; gap: 13px;
+  padding: 13px 16px; border-radius: var(--rad);
+  border: 1.5px solid var(--border);
+  background: var(--card); cursor: pointer;
+  transition: border-color .15s, background .15s, transform .12s;
+  text-align: left;
+}
+.modal-mode-btn:hover { border-color: var(--p3); background: rgba(88,28,180,.2); transform: translateX(4px); }
+.modal-mode-btn.sel {
+  border-color: var(--p4);
+  background: rgba(168,85,247,.15);
+  box-shadow: 0 0 0 2px var(--p3);
+}
+.mmb-ico { font-size: 1.7rem; width: 36px; text-align: center; }
+.mmb-text .mmb-name { font-family: var(--font-head); font-size: 1rem; font-weight: 700; color: #fff; }
+.mmb-text .mmb-desc { font-size: .75rem; color: var(--p5); margin-top: 1px; }
+.mmb-check { margin-left: auto; font-size: 1.2rem; opacity: 0; transition: opacity .15s; }
+.modal-mode-btn.sel .mmb-check { opacity: 1; }
+
+/* Level pills in modal */
+.level-pills { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 22px; }
+.lvl-pill {
+  padding: 6px 13px; border-radius: 30px;
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  font-family: var(--font-head); font-size: .82rem; font-weight: 700;
+  color: var(--p5); cursor: pointer;
+  transition: all .15s;
+}
+.lvl-pill:hover { border-color: var(--p4); color: #fff; }
+.lvl-pill.sel {
+  background: linear-gradient(135deg, var(--p2), var(--p3));
+  border-color: var(--p4); color: var(--gold);
+  box-shadow: 0 2px 12px rgba(168,85,247,.35);
+}
+
+.modal-play-btn {
+  width: 100%; padding: 15px;
+  border-radius: var(--rad); border: none;
+  background: linear-gradient(135deg, var(--p2), var(--p4));
+  color: #fff; font-family: var(--font-head); font-size: 1.2rem; font-weight: 700;
+  cursor: pointer; letter-spacing: .5px;
+  box-shadow: 0 4px 20px rgba(126,34,206,.5);
+  transition: transform .14s, box-shadow .14s;
+}
+.modal-play-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(168,85,247,.6); }
+.modal-play-btn:active { transform: scale(.98); }
+.modal-play-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+/* ─────────────────────────────────────────
+   GAME SCREEN
+───────────────────────────────────────── */
+#game { display: none; flex-direction: column; min-height: 100vh; }
+#game.active { display: flex; }
+
+/* NAVBAR */
+.gnav {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(14,1,32,.9); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+.gnav-inner {
+  max-width: 780px; margin: 0 auto;
+  padding: 0 14px;
+  display: flex; align-items: center; gap: 8px;
+  height: 58px;
+}
+
+.gnav-home {
+  display: flex; align-items: center; gap: 5px;
+  background: none; border: 1.5px solid var(--border);
+  border-radius: var(--rad-sm); padding: 6px 12px;
+  color: var(--p5); font-family: var(--font-head); font-size: .85rem; font-weight: 700;
+  cursor: pointer; transition: all .15s; white-space: nowrap;
+}
+.gnav-home:hover { border-color: var(--p4); color: #fff; }
+
+.gnav-sep { width: 1px; height: 26px; background: var(--border); flex-shrink: 0; }
+
+/* Switcher groups */
+.gnav-group { display: flex; gap: 4px; }
+.gnav-btn {
+  padding: 5px 10px; border-radius: 8px;
+  border: 1.5px solid transparent;
+  background: none; color: var(--p5);
+  font-family: var(--font-head); font-size: .8rem; font-weight: 700;
+  cursor: pointer; transition: all .15s; white-space: nowrap;
+}
+.gnav-btn:hover { background: rgba(255,255,255,.06); color: #fff; }
+.gnav-btn.gact { color: var(--gold); border-color: var(--gold); background: rgba(250,204,21,.1); }
+
+/* level dropdown in nav */
+.gnav-lv-wrap { position: relative; }
+.gnav-lv-btn {
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 10px; border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: none; color: var(--p5);
+  font-family: var(--font-head); font-size: .8rem; font-weight: 700;
+  cursor: pointer; transition: all .15s;
+}
+.gnav-lv-btn:hover, .gnav-lv-btn.open { border-color: var(--p4); color: #fff; background: rgba(88,28,180,.2); }
+.gnav-lv-dropdown {
+  position: absolute; top: calc(100% + 8px); left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface); border: 1.5px solid var(--border2);
+  border-radius: var(--rad); padding: 10px;
+  display: flex; flex-wrap: wrap; gap: 6px; width: 230px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.6);
+  opacity: 0; pointer-events: none;
+  transition: opacity .18s, transform .18s;
+  transform: translateX(-50%) translateY(-6px);
+  z-index: 100;
+}
+.gnav-lv-dropdown.open {
+  opacity: 1; pointer-events: all;
+  transform: translateX(-50%) translateY(0);
+}
+.gnav-lv-opt {
+  padding: 5px 11px; border-radius: 20px;
+  border: 1.5px solid var(--border); background: var(--card);
+  font-family: var(--font-head); font-size: .75rem; font-weight: 700;
+  color: var(--p5); cursor: pointer; transition: all .12s;
+}
+.gnav-lv-opt:hover { border-color: var(--p4); color: #fff; }
+.gnav-lv-opt.sel { background: var(--p2); border-color: var(--p4); color: var(--gold); }
+
+.gnav-spacer { flex: 1; }
+
+/* score display */
+.gnav-scores { display: flex; align-items: center; gap: 6px; }
+.gnav-score-chip {
+  display: flex; flex-direction: column; align-items: center;
+  min-width: 46px;
+}
+.gnav-score-v {
+  font-family: var(--font-head); font-size: 1.1rem; font-weight: 800; color: var(--gold);
+  line-height: 1; transition: transform .25s;
+}
+.gnav-score-v.pop { animation: miniPop .35s cubic-bezier(.34,1.56,.64,1); }
+@keyframes miniPop { 0%,100%{transform:scale(1)} 50%{transform:scale(1.5)} }
+.gnav-score-l { font-size: .58rem; color: var(--p5); text-transform: uppercase; letter-spacing: .8px; font-weight: 700; }
+
+.streak-chip {
+  display: flex; align-items: center; gap: 4px;
+  background: rgba(250,204,21,.1); border: 1px solid rgba(250,204,21,.3);
+  border-radius: 20px; padding: 4px 10px;
+  font-family: var(--font-head); font-size: .85rem; font-weight: 800;
+  color: var(--gold);
+}
+.streak-chip.hot { background: rgba(251,146,60,.15); border-color: rgba(251,146,60,.4); color: #fb923c; }
+
+/* hearts */
+.hearts-row { display: flex; gap: 3px; }
+.heart { font-size: 1rem; transition: transform .2s; }
+.heart.lost { filter: grayscale(1); opacity: .3; }
+
+/* ─────────────────────────────────────────
+   PROGRESS BAR (game)
+───────────────────────────────────────── */
+.gbar-wrap {
+  max-width: 780px; margin: 0 auto; padding: 10px 16px 0;
+}
+.gbar-track {
+  height: 8px; background: rgba(255,255,255,.07);
+  border-radius: 99px; overflow: hidden;
+}
+.gbar-fill {
+  height: 100%; border-radius: 99px;
+  background: linear-gradient(90deg, var(--p3), var(--p4));
+  transition: width .5s cubic-bezier(.34,1.56,.64,1);
+}
+.gbar-meta {
+  display: flex; justify-content: space-between;
+  font-size: .72rem; color: var(--p5); margin-top: 5px; font-weight: 700;
+}
+
+/* ─────────────────────────────────────────
+   QUESTION AREA
+───────────────────────────────────────── */
+.game-body {
+  flex: 1; max-width: 780px; margin: 0 auto; width: 100%;
+  padding: 20px 16px 60px;
+}
+
+/* Single question card (Duolingo style) */
+.q-stage {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 24px;
+  padding: 28px 24px;
+  margin-bottom: 16px;
+  transition: border-color .3s;
+  box-shadow: 0 2px 16px rgba(0,0,0,.3);
+}
+.q-stage.stage-correct { border-color: var(--green); animation: glowGreen .6s ease; }
+.q-stage.stage-wrong   { border-color: var(--red);   animation: shakeX .5s ease; }
+@keyframes glowGreen { 0%{box-shadow:0 0 0 0 rgba(34,197,94,.6)} 70%{box-shadow:0 0 0 16px rgba(34,197,94,0)} 100%{box-shadow:none} }
+@keyframes shakeX { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-10px)} 40%{transform:translateX(10px)} 60%{transform:translateX(-7px)} 80%{transform:translateX(7px)} }
+
+.q-top {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 16px;
+}
+.q-badge {
+  padding: 4px 11px; border-radius: 20px;
+  font-family: var(--font-head); font-size: .78rem; font-weight: 700;
+}
+.q-num-lbl { color: var(--p5); font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; }
+
+.q-expr {
+  font-family: var(--font-head); font-size: clamp(2rem, 5vw, 2.8rem); font-weight: 700;
+  color: #fff; margin-bottom: 22px; min-height: 3rem;
+  line-height: 1.1;
+}
+.q-cursor-blink {
+  display: inline-block; width: 3px; height: .85em;
+  background: var(--p4); margin-left: 2px; vertical-align: middle;
+  animation: curBlink .6s step-end infinite;
+}
+@keyframes curBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* MCQ grid */
+.mcq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media(max-width:400px){ .mcq-grid{grid-template-columns:1fr} }
+
+.mcq-btn {
+  padding: 15px 12px; border-radius: var(--rad);
+  border: 2px solid var(--border2);
+  background: var(--surface);
+  color: #e9d5ff; font-family: var(--font-head); font-size: 1.05rem; font-weight: 700;
+  cursor: pointer; transition: all .14s; text-align: center;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.mcq-btn .opt-ltr {
+  width: 24px; height: 24px; border-radius: 6px;
+  background: rgba(255,255,255,.08);
+  font-size: .72rem; font-weight: 800; color: var(--p5);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.mcq-btn:hover:not(:disabled) {
+  border-color: var(--p4); background: rgba(168,85,247,.15);
+  transform: translateY(-2px);
+}
+.mcq-btn.opt-hit  { border-color: var(--green); background: rgba(34,197,94,.15); color: var(--green2); }
+.mcq-btn.opt-miss { border-color: var(--red);   background: rgba(239,68,68,.15);  color: var(--red2); }
+.mcq-btn.opt-show { border-color: var(--green); background: rgba(34,197,94,.08);  color: var(--green2); }
+.mcq-btn:disabled { cursor: default; transform: none; }
+
+/* Fill input */
+.fill-area { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.fill-inp {
+  background: var(--surface); border: 2px solid var(--border2);
+  border-radius: var(--rad-sm); color: #fff;
+  font-family: var(--font-head); font-size: 1.5rem; font-weight: 700;
+  padding: 10px 16px; width: 150px; outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.fill-inp:focus { border-color: var(--p4); box-shadow: 0 0 0 3px rgba(168,85,247,.2); }
+.fill-inp.inp-ok  { border-color: var(--green); color: var(--green2); box-shadow: 0 0 0 3px rgba(34,197,94,.2); }
+.fill-inp.inp-err { border-color: var(--red);   color: var(--red2);   box-shadow: 0 0 0 3px rgba(239,68,68,.2); }
+.fill-inp:disabled { cursor: default; }
+
+.fill-submit {
+  padding: 11px 22px; border-radius: var(--rad-sm); border: none;
+  background: linear-gradient(135deg, var(--p2), var(--p4));
+  color: #fff; font-family: var(--font-head); font-size: 1rem; font-weight: 700;
+  cursor: pointer; transition: all .14s;
+  box-shadow: 0 3px 14px rgba(126,34,206,.4);
+}
+.fill-submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(168,85,247,.5); }
+.fill-submit:disabled { opacity: .5; cursor: default; transform: none; }
+
+/* Result banner */
+.result-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 18px; border-radius: var(--rad);
+  margin-top: 16px;
+  animation: slideUpFade .3s ease both;
+}
+@keyframes slideUpFade { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+.result-bar.r-correct { background: rgba(34,197,94,.12); border: 1.5px solid rgba(34,197,94,.35); }
+.result-bar.r-wrong   { background: rgba(239,68,68,.12);  border: 1.5px solid rgba(239,68,68,.35); }
+.rb-ico { font-size: 1.6rem; }
+.rb-text .rb-title { font-family: var(--font-head); font-size: 1rem; font-weight: 800; }
+.rb-text .rb-sub   { font-size: .78rem; color: var(--p5); margin-top: 2px; }
+.r-correct .rb-text .rb-title { color: var(--green2); }
+.r-wrong   .rb-text .rb-title { color: var(--red2); }
+.rb-pts { margin-left: auto; font-family: var(--font-head); font-size: 1.1rem; font-weight: 800; color: var(--gold); }
+
+/* continue button */
+.continue-btn {
+  width: 100%; padding: 15px; border-radius: var(--rad); border: none;
+  font-family: var(--font-head); font-size: 1.1rem; font-weight: 700;
+  cursor: pointer; transition: all .14s; letter-spacing: .3px;
+  margin-top: 12px;
+}
+.continue-btn.c-correct {
+  background: linear-gradient(135deg, var(--green), #16a34a);
+  color: #fff; box-shadow: 0 4px 18px rgba(34,197,94,.4);
+}
+.continue-btn.c-wrong {
+  background: linear-gradient(135deg, var(--p2), var(--p3));
+  color: #fff; box-shadow: 0 4px 18px rgba(126,34,206,.4);
+}
+.continue-btn:hover { transform: translateY(-2px); }
+.continue-btn:active { transform: scale(.98); }
+
+/* ─────────────────────────────────────────
+   MATCH THE FOLLOWING  (Duolingo style)
+───────────────────────────────────────── */
+.match-prompt {
+  font-family: var(--font-head); font-size: .9rem; font-weight: 700;
+  color: var(--p5); text-transform: uppercase; letter-spacing: 1px;
+  margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+}
+
+.match-pairs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.match-left-col, .match-right-col { display: flex; flex-direction: column; gap: 8px; }
+
+.match-tile {
+  padding: 14px 12px; border-radius: var(--rad);
+  border: 2px solid var(--border2);
+  background: var(--surface);
+  font-family: var(--font-head); font-size: .95rem; font-weight: 700;
+  cursor: pointer; text-align: center;
+  transition: all .14s; color: #e9d5ff;
+  min-height: 52px; display: flex; align-items: center; justify-content: center;
+  line-height: 1.3;
+}
+.match-tile:hover:not(.mt-done):not(.mt-locked) {
+  border-color: var(--p4); background: rgba(168,85,247,.15);
+  transform: scale(1.03);
+}
+.match-tile.mt-sel {
+  border-color: var(--p4); background: rgba(168,85,247,.22);
+  box-shadow: 0 0 0 3px rgba(168,85,247,.25);
+}
+.match-tile.mt-done { cursor: default; }
+.match-tile.mt-wrong { animation: shakeX .4s ease; border-color: var(--red); background: rgba(239,68,68,.12); }
+.match-tile.mt-locked { cursor: default; opacity: .55; }
+
+/* ─────────────────────────────────────────
+   CONFETTI
+───────────────────────────────────────── */
+.conf { position: fixed; pointer-events: none; z-index: 999; border-radius: 2px; }
+@keyframes confFall {
+  to { transform: translateY(105vh) rotate(var(--r,360deg)); opacity: 0; }
+}
+
+/* Toast notification */
+.toast {
+  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+  background: var(--surface); border: 1.5px solid var(--border2);
+  border-radius: 30px; padding: 10px 22px;
+  font-family: var(--font-head); font-size: .95rem; font-weight: 700;
+  color: #fff; z-index: 300;
+  box-shadow: 0 8px 30px rgba(0,0,0,.5);
+  animation: toastIn .3s ease both;
+  white-space: nowrap;
+}
+@keyframes toastIn { from{opacity:0;transform:translateX(-50%) translateY(14px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+
+/* level up splash */
+.lvlup-splash {
+  position: fixed; inset: 0; z-index: 400;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(6,0,20,.6); backdrop-filter: blur(6px);
+  animation: fadeIn .2s ease both;
+}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.lvlup-box {
+  background: var(--surface); border: 2px solid var(--p4);
+  border-radius: 28px; padding: 40px 36px; text-align: center;
+  animation: popIn .4s cubic-bezier(.34,1.56,.64,1) both;
+  box-shadow: 0 0 60px rgba(168,85,247,.4);
+}
+@keyframes popIn{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+.lvlup-ico { font-size: 4rem; margin-bottom: 12px; display: block; }
+.lvlup-title { font-family: var(--font-head); font-size: 2rem; font-weight: 800; color: var(--gold); margin-bottom: 6px; }
+.lvlup-sub   { color: var(--p5); font-size: .9rem; margin-bottom: 20px; }
+.lvlup-ok { padding: 12px 32px; border-radius: var(--rad-sm); border: none;
+  background: linear-gradient(135deg,var(--p2),var(--p4)); color:#fff;
+  font-family:var(--font-head);font-size:1rem;font-weight:700;cursor:pointer; }
+
+/* Baby Mode */
+.baby-mode-band {
+  width: 100%;
+  order: 3;
+  margin-top: 30px;
+  padding: 20px;
+  border: 2px solid rgba(45,212,191,.35);
+  border-radius: var(--rad-lg);
+  background:
+    linear-gradient(135deg, rgba(20,184,166,.18), rgba(250,204,21,.12) 45%, rgba(251,113,133,.14));
+  box-shadow: 0 10px 36px rgba(0,0,0,.22);
+}
+#home > .home-logo { order: 0; }
+#home > .home-tagline { order: 1; }
+#home > .xp-row { order: 2; }
+#home > .section-lbl { order: 4; }
+#home > .op-grid { order: 5; }
+#home > .home-stats { order: 6; }
+.baby-home-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  margin-bottom: 16px;
+}
+.baby-kicker {
+  font-family: var(--font-head); font-size: .78rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 1.2px;
+  color: #67e8f9;
+}
+.baby-home-title {
+  font-family: var(--font-head); font-size: clamp(1.45rem, 4vw, 2rem);
+  line-height: 1.02; color: #fff; margin-top: 2px;
+}
+.baby-home-copy {
+  color: #d9f99d; font-size: .82rem; font-weight: 800; margin-top: 4px;
+}
+.baby-start-btn {
+  flex-shrink: 0;
+  border: none; border-radius: 999px; padding: 12px 18px;
+  background: linear-gradient(135deg, #14b8a6, #22c55e);
+  color: #04130f; font-family: var(--font-head); font-size: .98rem; font-weight: 800;
+  cursor: pointer; box-shadow: 0 8px 22px rgba(20,184,166,.28);
+  transition: transform .14s, box-shadow .14s;
+}
+.baby-start-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(34,197,94,.32); }
+.baby-start-btn:active { transform: scale(.98); }
+.baby-card-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(98px,1fr)); gap: 10px;
+}
+.baby-home-card {
+  min-height: 118px;
+  border: 1.5px solid rgba(255,255,255,.18);
+  border-radius: var(--rad);
+  background: rgba(15,23,42,.42);
+  color: #fff; cursor: pointer;
+  padding: 12px 10px;
+  display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px;
+  text-align: center;
+  transition: transform .14s, border-color .14s, background .14s;
+}
+.baby-home-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(250,204,21,.65);
+  background: rgba(15,23,42,.62);
+}
+.baby-card-ico { font-size: 2.1rem; line-height: 1; }
+.baby-card-title { font-family: var(--font-head); font-size: .98rem; font-weight: 800; line-height: 1; }
+.baby-card-sub { color: #bae6fd; font-size: .68rem; font-weight: 800; line-height: 1.25; }
+
+#baby-screen { display: none; flex-direction: column; min-height: 100vh; }
+#baby-screen.active { display: flex; }
+.baby-nav {
+  position: sticky; top: 0; z-index: 60;
+  background: rgba(2,19,34,.92); backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(45,212,191,.28);
+}
+.baby-nav-inner {
+  max-width: 980px; margin: 0 auto; padding: 0 14px; height: 62px;
+  display: flex; align-items: center; gap: 12px;
+}
+.baby-nav-title {
+  min-width: 0; display: flex; flex-direction: column; line-height: 1.05;
+  font-family: var(--font-head); font-weight: 800;
+}
+.baby-nav-title span:first-child { color: #fef08a; font-size: 1.05rem; }
+.baby-nav-title span:last-child { color: #99f6e4; font-size: .72rem; text-transform: uppercase; letter-spacing: 1px; }
+.baby-score-pill {
+  margin-left: auto; display: flex; align-items: center; gap: 7px;
+  border: 1.5px solid rgba(250,204,21,.38);
+  border-radius: 999px; padding: 7px 13px;
+  background: rgba(250,204,21,.1);
+  font-family: var(--font-head); font-weight: 800; color: var(--gold);
+}
+.baby-playground {
+  width: 100%; max-width: 980px; margin: 0 auto; padding: 18px 16px 62px;
+}
+.baby-activity-tabs, .baby-category-row, .baby-level-row, .baby-story-row {
+  display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: thin;
+}
+.baby-tab, .baby-chip {
+  border: 1.5px solid rgba(255,255,255,.14);
+  border-radius: 999px;
+  background: rgba(255,255,255,.06);
+  color: #dbeafe;
+  font-family: var(--font-head); font-size: .86rem; font-weight: 800;
+  cursor: pointer; white-space: nowrap;
+  transition: transform .14s, border-color .14s, background .14s, color .14s;
+}
+.baby-tab { padding: 8px 13px; }
+.baby-chip { padding: 7px 12px; }
+.baby-tab:hover, .baby-chip:hover { transform: translateY(-1px); border-color: rgba(56,189,248,.65); color: #fff; }
+.baby-tab.bact-active {
+  background: linear-gradient(135deg, rgba(20,184,166,.35), rgba(56,189,248,.28));
+  border-color: #5eead4; color: #fff;
+}
+.baby-chip.bcat-active {
+  background: linear-gradient(135deg, rgba(250,204,21,.24), rgba(251,113,133,.22));
+  border-color: #facc15; color: #fef9c3;
+}
+.baby-level-row { margin-bottom: 2px; }
+.baby-level-chip {
+  border: 1.5px solid rgba(255,255,255,.14);
+  border-radius: 16px;
+  background: rgba(255,255,255,.055);
+  color: #dbeafe;
+  font-family: var(--font-head); font-size: .8rem; font-weight: 900;
+  cursor: pointer; white-space: nowrap;
+  padding: 7px 11px;
+  transition: transform .14s, border-color .14s, background .14s;
+}
+.baby-level-chip:hover { transform: translateY(-1px); border-color: #67e8f9; }
+.baby-level-chip.blvl-active {
+  border-color: #fb7185;
+  color: #fff;
+  background: linear-gradient(135deg, rgba(251,113,133,.25), rgba(250,204,21,.18));
+}
+.baby-card-stage {
+  margin-top: 10px;
+  background: rgba(15,23,42,.78);
+  border: 2px solid rgba(45,212,191,.28);
+  border-radius: 28px;
+  padding: 22px;
+  box-shadow: 0 18px 46px rgba(0,0,0,.34);
+}
+.baby-stage-top {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin-bottom: 16px;
+}
+.baby-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1.5px solid rgba(45,212,191,.45);
+  border-radius: 999px; padding: 7px 13px;
+  background: rgba(20,184,166,.14);
+  font-family: var(--font-head); font-weight: 800; color: #99f6e4;
+}
+.baby-mini-stat {
+  font-family: var(--font-head); font-size: .84rem; font-weight: 800; color: #fef08a;
+}
+.baby-prompt {
+  font-family: var(--font-head); font-size: clamp(1.2rem, 4vw, 1.8rem);
+  font-weight: 800; color: #fff; line-height: 1.12; margin-bottom: 14px;
+}
+.baby-hero {
+  display: grid; grid-template-columns: minmax(110px, 180px) 1fr; gap: 16px; align-items: center;
+  margin-bottom: 18px;
+}
+.baby-visual {
+  min-height: 138px; border-radius: 24px;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, rgba(250,204,21,.18), rgba(45,212,191,.18));
+  border: 1.5px solid rgba(255,255,255,.16);
+  font-size: clamp(3.2rem, 12vw, 5.2rem);
+}
+.baby-word { font-family: var(--font-head); font-size: clamp(2rem, 7vw, 4rem); font-weight: 800; color: #fef08a; line-height: 1; }
+.baby-subtle { color: #bae6fd; font-weight: 800; margin-top: 6px; line-height: 1.35; }
+.baby-choice-grid {
+  display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px;
+}
+.baby-choice {
+  min-height: 90px; border: 2px solid rgba(255,255,255,.14); border-radius: var(--rad);
+  background: rgba(255,255,255,.07); color: #fff;
+  font-family: var(--font-head); font-size: 1.12rem; font-weight: 800;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 12px; transition: transform .14s, border-color .14s, background .14s;
+}
+.baby-choice:hover:not(:disabled) { transform: translateY(-2px); border-color: #67e8f9; background: rgba(56,189,248,.14); }
+.baby-choice:disabled { cursor: default; }
+.baby-choice .baby-choice-ico { font-size: 2.15rem; line-height: 1; }
+.baby-choice.hit { border-color: var(--green); background: rgba(34,197,94,.18); }
+.baby-choice.miss { border-color: var(--red); background: rgba(239,68,68,.16); animation: shakeX .45s ease; }
+.baby-choice.show { border-color: var(--gold); background: rgba(250,204,21,.16); }
+.baby-fill-row {
+  display: flex; gap: 10px; align-items: stretch; margin-top: 8px;
+}
+.baby-fill-input {
+  flex: 1; min-width: 0;
+  border: 2px solid rgba(255,255,255,.15); border-radius: var(--rad);
+  background: rgba(255,255,255,.08); color: #fff;
+  font-family: var(--font-head); font-size: 1.35rem; font-weight: 800;
+  padding: 12px 16px; outline: none;
+}
+.baby-fill-input:focus { border-color: #67e8f9; box-shadow: 0 0 0 3px rgba(103,232,249,.16); }
+.baby-fill-submit, .baby-mini-btn {
+  border: none; border-radius: var(--rad); padding: 12px 18px;
+  background: linear-gradient(135deg, #facc15, #fb7185);
+  color: #1c1020; font-family: var(--font-head); font-size: 1rem; font-weight: 900;
+  cursor: pointer; transition: transform .14s, filter .14s;
+}
+.baby-fill-submit:hover, .baby-mini-btn:hover { transform: translateY(-2px); filter: brightness(1.04); }
+.baby-result {
+  margin-top: 14px; border-radius: var(--rad); padding: 12px 14px;
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--font-head); font-weight: 800;
+  animation: slideUpFade .25s ease both;
+}
+.baby-result.ok { background: rgba(34,197,94,.14); border: 1.5px solid rgba(34,197,94,.38); color: #86efac; }
+.baby-result.no { background: rgba(239,68,68,.13); border: 1.5px solid rgba(239,68,68,.38); color: #fca5a5; }
+.baby-match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.baby-match-col { display: flex; flex-direction: column; gap: 9px; }
+.baby-match-tile {
+  min-height: 72px; border: 2px solid rgba(255,255,255,.14); border-radius: var(--rad);
+  background: rgba(255,255,255,.07); color: #fff;
+  font-family: var(--font-head); font-size: 1.05rem; font-weight: 800;
+  display: flex; align-items: center; justify-content: center; text-align: center; gap: 8px;
+  padding: 10px; cursor: pointer; transition: transform .14s, border-color .14s, background .14s;
+}
+.baby-match-tile:hover:not(.done) { transform: scale(1.02); border-color: #67e8f9; }
+.baby-match-tile.sel { border-color: #facc15; background: rgba(250,204,21,.16); }
+.baby-match-tile.done { color: #fff; cursor: default; }
+.baby-match-tile.bad { border-color: var(--red); background: rgba(239,68,68,.14); animation: shakeX .4s ease; }
+.baby-token {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  line-height: 1; text-align: center;
+}
+.baby-token.stack { flex-direction: column; line-height: 1.08; }
+.baby-token.big { font-size: clamp(3rem, 10vw, 5.2rem); font-family: var(--font-head); font-weight: 900; }
+.baby-token.word { font-size: clamp(1.3rem, 5vw, 2.4rem); font-family: var(--font-head); font-weight: 900; color: #fef08a; }
+.baby-token.count {
+  max-width: 220px; flex-wrap: wrap; gap: 4px;
+  font-size: clamp(1.5rem, 5vw, 2.3rem);
+}
+.baby-fill-help {
+  margin-top: 8px;
+  color: #bae6fd;
+  font-family: var(--font-head);
+  font-size: .9rem;
+  font-weight: 800;
+}
+.baby-img {
+  width: 100%; height: 100%; min-height: 132px;
+  object-fit: cover; border-radius: 20px;
+  display: block;
+}
+.baby-choice .baby-img, .baby-match-tile .baby-img {
+  width: min(150px, 100%); height: 86px; min-height: 86px;
+}
+.baby-token.stack .baby-img {
+  width: 128px; height: 82px; min-height: 82px;
+}
+.baby-visual.has-img {
+  padding: 8px; overflow: hidden;
+  background: rgba(255,255,255,.08);
+}
+.baby-flash-card, .telugu-card {
+  min-height: 360px; border-radius: 30px; border: 2px solid rgba(250,204,21,.35);
+  background: linear-gradient(150deg, rgba(250,204,21,.18), rgba(20,184,166,.18), rgba(251,113,133,.16));
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+  text-align: center; padding: 26px; overflow: hidden;
+}
+.baby-flash-card.flash-pop { animation: babyFlashPop .32s cubic-bezier(.34,1.56,.64,1); }
+@keyframes babyFlashPop { from{transform:scale(.94);opacity:.3} to{transform:scale(1);opacity:1} }
+.baby-flash-letter {
+  font-family: var(--font-head); font-size: clamp(5rem, 22vw, 10rem);
+  font-weight: 900; line-height: .88; color: #fff;
+  text-shadow: 0 8px 26px rgba(0,0,0,.28);
+}
+.baby-flash-object { font-size: clamp(4rem, 14vw, 7rem); line-height: 1; }
+.baby-flash-word { font-family: var(--font-head); font-size: clamp(1.8rem, 6vw, 3rem); font-weight: 900; color: #fef08a; }
+.baby-flash-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 14px; }
+.telugu-card { min-height: 330px; }
+.telugu-letter {
+  font-family: var(--font-telugu); font-size: clamp(5rem, 20vw, 9rem);
+  font-weight: 800; color: #fff; line-height: 1;
+}
+.telugu-card .telugu-letter { font-size: clamp(7.5rem, 28vw, 15rem); }
+.telugu-sound {
+  font-family: var(--font-head); color: #fef08a; font-size: clamp(1.4rem, 5vw, 2.4rem);
+  font-weight: 900;
+}
+.telugu-word {
+  font-family: var(--font-telugu); color: #bbf7d0; font-size: clamp(1.25rem, 4vw, 2rem);
+  font-weight: 800;
+}
+.telugu-grid {
+  margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fit, minmax(54px,1fr)); gap: 8px;
+}
+.script-card { min-height: 390px; }
+.script-letter-hindi {
+  font-family: 'Nirmala UI', 'Mangal', sans-serif;
+  font-size: clamp(7.5rem, 28vw, 15rem);
+  font-weight: 900; color: #fff; line-height: 1;
+}
+.script-grid {
+  margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fit, minmax(54px,1fr)); gap: 8px;
+}
+.script-tile {
+  min-height: 54px; border: 1.5px solid rgba(255,255,255,.14); border-radius: 14px;
+  background: rgba(255,255,255,.06); color: #fff;
+  font-family: var(--font-telugu); font-size: 1.45rem; font-weight: 800;
+  cursor: pointer; transition: transform .14s, border-color .14s, background .14s;
+}
+.script-tile.hindi { font-family: 'Nirmala UI', 'Mangal', sans-serif; }
+.script-tile:hover { transform: translateY(-2px); border-color: #67e8f9; }
+.script-tile.active { border-color: #facc15; background: rgba(250,204,21,.16); color: #fef08a; }
+.story-shell {
+  display: grid; grid-template-columns: minmax(220px, 1fr) minmax(260px, 1.05fr);
+  gap: 18px; align-items: stretch;
+}
+.story-frame {
+  min-height: 330px; border-radius: 28px; overflow: hidden;
+  border: 2px solid rgba(250,204,21,.36);
+  position: relative; background: rgba(255,255,255,.08);
+}
+.story-frame img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  animation: storyFloat 5s ease-in-out infinite;
+}
+@keyframes storyFloat { 0%,100%{transform:scale(1.02)} 50%{transform:scale(1.08) translateY(-4px)} }
+.story-panel {
+  border-radius: 28px;
+  background: linear-gradient(150deg, rgba(20,184,166,.16), rgba(250,204,21,.12), rgba(251,113,133,.12));
+  border: 1.5px solid rgba(255,255,255,.14);
+  padding: 22px; display: flex; flex-direction: column; justify-content: center;
+}
+.story-title {
+  font-family: var(--font-head); font-size: clamp(1.6rem, 5vw, 2.7rem);
+  font-weight: 900; color: #fef08a; line-height: 1.02;
+}
+.story-text {
+  margin-top: 12px; color: #fff; font-size: 1.05rem;
+  font-weight: 800; line-height: 1.45;
+}
+.story-moral {
+  margin-top: 16px; padding: 12px 14px; border-radius: 16px;
+  background: rgba(34,197,94,.14); border: 1.5px solid rgba(34,197,94,.34);
+  color: #bbf7d0; font-family: var(--font-head); font-weight: 900;
+}
+.story-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+.telugu-tile {
+  min-height: 54px; border: 1.5px solid rgba(255,255,255,.14); border-radius: 14px;
+  background: rgba(255,255,255,.06); color: #fff;
+  font-family: var(--font-telugu); font-size: 1.45rem; font-weight: 800;
+  cursor: pointer; transition: transform .14s, border-color .14s, background .14s;
+}
+.telugu-tile:hover { transform: translateY(-2px); border-color: #67e8f9; }
+.telugu-tile.active { border-color: #facc15; background: rgba(250,204,21,.16); color: #fef08a; }
+.baby-celebrate {
+  position: fixed; inset: 0; z-index: 500;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(2,6,23,.24);
+  backdrop-filter: blur(2px);
+  animation: fadeIn .15s ease both;
+}
+.baby-celebrate-box {
+  width: min(320px, calc(100vw - 42px));
+  border: 2px solid rgba(250,204,21,.68);
+  border-radius: 26px;
+  background: linear-gradient(145deg, rgba(15,23,42,.96), rgba(20,184,166,.9));
+  padding: 22px 20px;
+  text-align: center;
+  box-shadow: 0 24px 70px rgba(0,0,0,.45);
+  animation: popIn .28s cubic-bezier(.34,1.56,.64,1) both;
+}
+.baby-celebrate-ico { font-size: 3rem; line-height: 1; margin-bottom: 4px; }
+.baby-celebrate-title {
+  font-family: var(--font-head); font-size: 1.7rem; font-weight: 900;
+  color: #fef08a; line-height: 1;
+}
+.baby-celebrate-sub {
+  margin: 6px 0 16px; color: #dcfce7; font-weight: 800;
+}
+.baby-celebrate-btn {
+  width: 100%;
+  border: none; border-radius: 16px; padding: 12px;
+  background: linear-gradient(135deg, #facc15, #fb7185);
+  color: #1c1020; font-family: var(--font-head); font-size: 1.05rem; font-weight: 900;
+  cursor: pointer;
+}
+.baby-fall {
+  position: fixed; top: -24px; z-index: 520; pointer-events: none;
+  font-size: 1.2rem;
+  animation: babyFall var(--fall-dur, 1.8s) linear forwards;
+}
+@keyframes babyFall {
+  to { transform: translateY(108vh) rotate(var(--fall-rot, 360deg)); opacity: 0; }
+}
+
+@media (max-width: 720px) {
+  .baby-home-head { flex-direction: column; align-items: stretch; }
+  .baby-start-btn { width: 100%; }
+  .baby-card-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .baby-hero { grid-template-columns: 1fr; text-align: center; }
+  .story-shell { grid-template-columns: 1fr; }
+  .baby-choice-grid, .baby-match-grid { grid-template-columns: 1fr; }
+  .baby-fill-row { flex-direction: column; }
+  .baby-nav-inner { gap: 8px; }
+  .baby-nav-title span:first-child { font-size: .94rem; }
+}
+
+/* utils */
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="bg-mesh"></div>
+<div id="root">
+
+<!-- ═══════════════════════════════════════
+     HOME SCREEN
+═══════════════════════════════════════ -->
+<div id="home">
+  <div class="home-logo">LEARNING IS FUN!</div>
+  <div class="home-tagline">🌟 Play, read, count, match, and discover something new!</div>
+
+  <!-- XP bar -->
+  <div class="xp-row">
+    <span class="xp-label">⚡ XP</span>
+    <div class="xp-bar-wrap"><div class="xp-bar-fill" id="home-xp-bar" style="width:0%"></div></div>
+    <span class="xp-label" id="home-xp-num">0 / 100</span>
+  </div>
+
+  <div class="section-lbl">Choose an Operation</div>
+
+  <div class="op-grid">
+    <div class="op-tile" data-op="add" onclick="openModal('add')">
+      <span class="op-tile-sym">+</span>
+      <div class="op-tile-name">Addition</div>
+      <div class="op-tile-desc">Add numbers together</div>
+      <div class="op-tile-stars" id="stars-add">
+        <div class="star-dot"></div><div class="star-dot"></div><div class="star-dot"></div>
+        <div class="star-dot"></div><div class="star-dot"></div>
+      </div>
+    </div>
+    <div class="op-tile" data-op="sub" onclick="openModal('sub')">
+      <span class="op-tile-sym">−</span>
+      <div class="op-tile-name">Subtraction</div>
+      <div class="op-tile-desc">Find the difference</div>
+      <div class="op-tile-stars" id="stars-sub">
+        <div class="star-dot"></div><div class="star-dot"></div><div class="star-dot"></div>
+        <div class="star-dot"></div><div class="star-dot"></div>
+      </div>
+    </div>
+    <div class="op-tile" data-op="mul" onclick="openModal('mul')">
+      <span class="op-tile-sym">×</span>
+      <div class="op-tile-name">Multiplication</div>
+      <div class="op-tile-desc">Scale up with groups</div>
+      <div class="op-tile-stars" id="stars-mul">
+        <div class="star-dot"></div><div class="star-dot"></div><div class="star-dot"></div>
+        <div class="star-dot"></div><div class="star-dot"></div>
+      </div>
+    </div>
+    <div class="op-tile" data-op="div" onclick="openModal('div')">
+      <span class="op-tile-sym">÷</span>
+      <div class="op-tile-name">Division</div>
+      <div class="op-tile-desc">Split into equal parts</div>
+      <div class="op-tile-stars" id="stars-div">
+        <div class="star-dot"></div><div class="star-dot"></div><div class="star-dot"></div>
+        <div class="star-dot"></div><div class="star-dot"></div>
+      </div>
+    </div>
+  </div>
+
+  <section class="baby-mode-band" aria-label="Baby Mode">
+    <div class="baby-home-head">
+      <div>
+        <div class="baby-kicker">Baby Mode</div>
+        <div class="baby-home-title">Little Learners Garden</div>
+        <div class="baby-home-copy">ABC, numbers, Telugu, Hindi, picture worlds, and tiny moral stories</div>
+      </div>
+      <button class="baby-start-btn" onclick="startBaby('mcq')">🌈 Start Baby Mode</button>
+    </div>
+
+    <div class="baby-card-grid">
+      <button class="baby-home-card" onclick="startBaby('mcq')">
+        <span class="baby-card-ico">🎯</span>
+        <span class="baby-card-title">Picture Quiz</span>
+        <span class="baby-card-sub">tap the answer</span>
+      </button>
+      <button class="baby-home-card" onclick="startBaby('fill')">
+        <span class="baby-card-ico">✏️</span>
+        <span class="baby-card-title">Tiny Typing</span>
+        <span class="baby-card-sub">fill the blank</span>
+      </button>
+      <button class="baby-home-card" onclick="startBaby('match')">
+        <span class="baby-card-ico">🧩</span>
+        <span class="baby-card-title">Match Pairs</span>
+        <span class="baby-card-sub">picture to word</span>
+      </button>
+      <button class="baby-home-card" onclick="startBaby('mcq','numbers')">
+        <span class="baby-card-ico">🔢</span>
+        <span class="baby-card-title">Numbers</span>
+        <span class="baby-card-sub">1 to one</span>
+      </button>
+      <button class="baby-home-card" onclick="startBaby('mcq','bodyparts')">
+        <span class="baby-card-ico">✋</span>
+        <span class="baby-card-title">Body Parts</span>
+        <span class="baby-card-sub">learn the body</span>
+      </button>
+      <button class="baby-home-card" onclick="startBaby('flash')">
+        <span class="baby-card-ico">⚡</span>
+        <span class="baby-card-title">ABC Flash</span>
+        <span class="baby-card-sub">big and small</span>
+      </button>
+      <button class="baby-home-card" onclick="startBaby('telugu')">
+        <span class="baby-card-ico">అ</span>
+        <span class="baby-card-title">Telugu</span>
+        <span class="baby-card-sub">varnamala</span>
+      </button>
+      <button class="baby-home-card" onclick="startBaby('hindi')">
+        <span class="baby-card-ico">अ</span>
+        <span class="baby-card-title">Hindi</span>
+        <span class="baby-card-sub">varnamala</span>
+      </button>
+      <button class="baby-home-card" onclick="startBaby('story')">
+        <span class="baby-card-ico">📖</span>
+        <span class="baby-card-title">Story Book</span>
+        <span class="baby-card-sub">moral stories</span>
+      </button>
+    </div>
+  </section>
+
+  <div class="home-stats">
+    <div class="stat-chip"><span class="ico">🔥</span><span class="val" id="hs-streak">0</span><span class="lbl">Day Streak</span></div>
+    <div class="stat-chip"><span class="ico">⭐</span><span class="val" id="hs-xp">0</span><span class="lbl">Total XP</span></div>
+    <div class="stat-chip"><span class="ico">✅</span><span class="val" id="hs-correct">0</span><span class="lbl">Correct</span></div>
+    <div class="stat-chip"><span class="ico">🏆</span><span class="val" id="hs-score">0</span><span class="lbl">Best Score</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     MODAL: OP POPUP
+═══════════════════════════════════════ -->
+<div class="modal-overlay" id="modal" onclick="overlayClick(event)">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+
+    <div class="modal-op-badge" id="modal-badge">➕ Addition</div>
+
+    <div class="modal-section-lbl">Choose Mode</div>
+    <div class="modal-modes">
+      <div class="modal-mode-btn" data-mode="mcq" onclick="pickMode('mcq')">
+        <span class="mmb-ico">🎯</span>
+        <div class="mmb-text">
+          <div class="mmb-name">Multiple Choice</div>
+          <div class="mmb-desc">4 options — tap the right one!</div>
+        </div>
+        <span class="mmb-check">✓</span>
+      </div>
+      <div class="modal-mode-btn" data-mode="fill" onclick="pickMode('fill')">
+        <span class="mmb-ico">✏️</span>
+        <div class="mmb-text">
+          <div class="mmb-name">Fill in the Blank</div>
+          <div class="mmb-desc">Type your answer & submit</div>
+        </div>
+        <span class="mmb-check">✓</span>
+      </div>
+      <div class="modal-mode-btn" data-mode="match" onclick="pickMode('match')">
+        <span class="mmb-ico">🔗</span>
+        <div class="mmb-text">
+          <div class="mmb-name">Match the Following</div>
+          <div class="mmb-desc">5 pairs — connect questions to answers</div>
+        </div>
+        <span class="mmb-check">✓</span>
+      </div>
+    </div>
+
+    <div class="modal-section-lbl">Choose Level</div>
+    <div class="level-pills" id="modal-lvl-pills"></div>
+
+    <button class="modal-play-btn" id="modal-play" onclick="startGame()" disabled>
+      🚀 Start Playing!
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     GAME SCREEN
+═══════════════════════════════════════ -->
+<div id="game">
+
+  <!-- NAVBAR -->
+  <nav class="gnav">
+    <div class="gnav-inner">
+      <button class="gnav-home" onclick="goHome()">🏠 Home</button>
+      <div class="gnav-sep"></div>
+
+      <div class="gnav-group" id="gnav-ops">
+        <button class="gnav-btn" data-nop="add" onclick="navOp('add')">➕</button>
+        <button class="gnav-btn" data-nop="sub" onclick="navOp('sub')">➖</button>
+        <button class="gnav-btn" data-nop="mul" onclick="navOp('mul')">✖️</button>
+        <button class="gnav-btn" data-nop="div" onclick="navOp('div')">➗</button>
+      </div>
+
+      <div class="gnav-sep"></div>
+
+      <div class="gnav-group" id="gnav-modes">
+        <button class="gnav-btn" data-nm="mcq"   onclick="navMode('mcq')">🎯</button>
+        <button class="gnav-btn" data-nm="fill"  onclick="navMode('fill')">✏️</button>
+        <button class="gnav-btn" data-nm="match" onclick="navMode('match')">🔗</button>
+      </div>
+
+      <div class="gnav-sep"></div>
+
+      <!-- Level dropdown -->
+      <div class="gnav-lv-wrap">
+        <button class="gnav-lv-btn" id="gnav-lv-btn" onclick="toggleLvDrop()">
+          <span id="gnav-lv-lbl">Lv.1</span> ▾
+        </button>
+        <div class="gnav-lv-dropdown" id="gnav-lv-drop"></div>
+      </div>
+
+      <div class="gnav-spacer"></div>
+
+      <div class="gnav-scores">
+        <div class="hearts-row" id="hearts-row"></div>
+        <div class="gnav-sep" style="height:20px"></div>
+        <div class="gnav-score-chip">
+          <div class="gnav-score-v" id="g-score">0</div>
+          <div class="gnav-score-l">Score</div>
+        </div>
+        <div class="streak-chip" id="g-streak">🔥 0</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Progress bar -->
+  <div class="gbar-wrap">
+    <div class="gbar-track"><div class="gbar-fill" id="gbar" style="width:0%"></div></div>
+    <div class="gbar-meta">
+      <span id="gbar-done">0 done</span>
+      <span id="gbar-xp">+0 XP this session</span>
+    </div>
+  </div>
+
+  <!-- Game body -->
+  <div class="game-body" id="game-body">
+    <!-- content injected here -->
+  </div>
+</div>
+
+<!-- BABY MODE SCREEN -->
+<div id="baby-screen">
+  <nav class="baby-nav">
+    <div class="baby-nav-inner">
+      <button class="gnav-home" onclick="goHome()">🏠 Home</button>
+      <div class="baby-nav-title">
+        <span id="baby-nav-name">Little Learners Garden</span>
+        <span id="baby-nav-sub">Baby Mode</span>
+      </div>
+      <div class="baby-score-pill">⭐ <span id="baby-score">0</span></div>
+    </div>
+  </nav>
+
+  <main class="baby-playground">
+    <div class="baby-activity-tabs" id="baby-activity-tabs">
+      <button class="baby-tab" data-baby-mode="mcq" onclick="babySwitchMode('mcq')">🎯 Picture Quiz</button>
+      <button class="baby-tab" data-baby-mode="fill" onclick="babySwitchMode('fill')">✏️ Fill Blank</button>
+      <button class="baby-tab" data-baby-mode="match" onclick="babySwitchMode('match')">🧩 Match</button>
+      <button class="baby-tab" data-baby-mode="flash" onclick="babySwitchMode('flash')">⚡ ABC Flash</button>
+      <button class="baby-tab" data-baby-mode="telugu" onclick="babySwitchMode('telugu')">అ Telugu</button>
+      <button class="baby-tab" data-baby-mode="hindi" onclick="babySwitchMode('hindi')">अ Hindi</button>
+      <button class="baby-tab" data-baby-mode="story" onclick="babySwitchMode('story')">📖 Story Book</button>
+    </div>
+
+    <div class="baby-category-row" id="baby-category-row"></div>
+    <div class="baby-level-row" id="baby-level-row"></div>
+    <div class="baby-story-row" id="baby-story-row"></div>
+    <div id="baby-body"></div>
+  </main>
+</div>
+
+</div><!-- /root -->
+
+<script>
+// ──────────────────────────────────────────
+// PERSISTENT STATE
+// ──────────────────────────────────────────
+const SAVE_KEY = 'maths_easy_save';
+let save = JSON.parse(localStorage.getItem(SAVE_KEY) || '{}');
+save.totalXP    = save.totalXP    || 0;
+save.totalRight = save.totalRight || 0;
+save.bestScore  = save.bestScore  || 0;
+save.streak     = save.streak     || 0;
+save.mastery    = save.mastery    || { add:0, sub:0, mul:0, div:0 };
+function persist(){ localStorage.setItem(SAVE_KEY, JSON.stringify(save)); }
+
+// ──────────────────────────────────────────
+// SESSION STATE
+// ──────────────────────────────────────────
+const G = {
+  op:'add', mode:'mcq', level:1,
+  score:0, correct:0, wrong:0, streak:0, xpSession:0,
+  done:0, hearts:5,
+  matchSelLeft:null, matchPaired:{}, matchCorrectMap:{},
+  matchWrong:0, matchBatch:0,
+  answering:false,
+};
+
+// ──────────────────────────────────────────
+// LEVELS
+// ──────────────────────────────────────────
+const LVL = [
+  {s:'Gr.3',  maxA:10,  maxB:10,  neg:0,dec:0},
+  {s:'Gr.3+', maxA:20,  maxB:20,  neg:0,dec:0},
+  {s:'Gr.4',  maxA:50,  maxB:50,  neg:0,dec:0},
+  {s:'Gr.5',  maxA:100, maxB:100, neg:0,dec:0},
+  {s:'Gr.6',  maxA:200, maxB:200, neg:1,dec:0},
+  {s:'Gr.7',  maxA:500, maxB:500, neg:1,dec:0},
+  {s:'Gr.8',  maxA:999, maxB:99,  neg:1,dec:1},
+  {s:'Gr.9',  maxA:999, maxB:999, neg:1,dec:1},
+  {s:'Gr.11', maxA:9999,maxB:999, neg:1,dec:1},
+  {s:'Gr.12', maxA:9999,maxB:9999,neg:1,dec:1},
+];
+
+const OP_META = {
+  add:{ sym:'➕', name:'Addition',       bg:'rgba(34,197,94,.18)',  border:'rgba(34,197,94,.5)',  color:'#4ade80' },
+  sub:{ sym:'➖', name:'Subtraction',    bg:'rgba(239,68,68,.18)',  border:'rgba(239,68,68,.5)',  color:'#f87171' },
+  mul:{ sym:'✖️', name:'Multiplication', bg:'rgba(250,204,21,.18)', border:'rgba(250,204,21,.5)', color:'#fde047' },
+  div:{ sym:'➗', name:'Division',       bg:'rgba(56,189,248,.18)', border:'rgba(56,189,248,.5)', color:'#7dd3fc' },
+};
+
+const BABY_ACTIVITIES = {
+  mcq:    { icon:'🎯', name:'Picture Quiz', sub:'Choose the happy match' },
+  fill:   { icon:'✏️', name:'Fill the Blank', sub:'Type the missing letter' },
+  match:  { icon:'🧩', name:'Match Pairs', sub:'Connect picture and word' },
+  flash:  { icon:'⚡', name:'ABC Flash', sub:'Big letter, small letter' },
+  telugu: { icon:'అ', name:'Telugu Varnamala', sub:'Letters in Telugu' },
+  hindi:  { icon:'अ', name:'Hindi Varnamala', sub:'Letters in Hindi' },
+  story:  { icon:'📖', name:'Story Book', sub:'Tiny moral stories' },
+};
+
+const BABY_CATEGORIES = {
+  alphabets: {
+    icon:'🔤', label:'Alphabets',
+    items:[
+      {letter:'A', small:'a', name:'Apple', emoji:'🍎'},
+      {letter:'B', small:'b', name:'Ball', emoji:'🏀'},
+      {letter:'C', small:'c', name:'Cat', emoji:'🐱'},
+      {letter:'D', small:'d', name:'Dog', emoji:'🐶'},
+      {letter:'E', small:'e', name:'Elephant', emoji:'🐘'},
+      {letter:'F', small:'f', name:'Fish', emoji:'🐟'},
+      {letter:'G', small:'g', name:'Grapes', emoji:'🍇'},
+      {letter:'H', small:'h', name:'House', emoji:'🏠'},
+      {letter:'I', small:'i', name:'Ice Cream', emoji:'🍦'},
+      {letter:'J', small:'j', name:'Juice', emoji:'🧃'},
+      {letter:'K', small:'k', name:'Kite', emoji:'🪁'},
+      {letter:'L', small:'l', name:'Lion', emoji:'🦁'},
+      {letter:'M', small:'m', name:'Mango', emoji:'🥭'},
+      {letter:'N', small:'n', name:'Nest', emoji:'🪺'},
+      {letter:'O', small:'o', name:'Orange', emoji:'🍊'},
+      {letter:'P', small:'p', name:'Parrot', emoji:'🦜'},
+      {letter:'Q', small:'q', name:'Queen', emoji:'👑'},
+      {letter:'R', small:'r', name:'Rabbit', emoji:'🐰'},
+      {letter:'S', small:'s', name:'Sun', emoji:'☀️'},
+      {letter:'T', small:'t', name:'Tree', emoji:'🌳'},
+      {letter:'U', small:'u', name:'Umbrella', emoji:'☂️'},
+      {letter:'V', small:'v', name:'Van', emoji:'🚐'},
+      {letter:'W', small:'w', name:'Watermelon', emoji:'🍉'},
+      {letter:'X', small:'x', name:'Xylophone', emoji:'🎼'},
+      {letter:'Y', small:'y', name:'Yak', emoji:'🐂'},
+      {letter:'Z', small:'z', name:'Zebra', emoji:'🦓'},
+    ]
+  },
+  numbers: {
+    icon:'🔢', label:'Numbers',
+    items:[
+      {number:1, digit:'1', word:'One', emoji:'1️⃣'}, {number:2, digit:'2', word:'Two', emoji:'2️⃣'},
+      {number:3, digit:'3', word:'Three', emoji:'3️⃣'}, {number:4, digit:'4', word:'Four', emoji:'4️⃣'},
+      {number:5, digit:'5', word:'Five', emoji:'5️⃣'}, {number:6, digit:'6', word:'Six', emoji:'6️⃣'},
+      {number:7, digit:'7', word:'Seven', emoji:'7️⃣'}, {number:8, digit:'8', word:'Eight', emoji:'8️⃣'},
+      {number:9, digit:'9', word:'Nine', emoji:'9️⃣'}, {number:10, digit:'10', word:'Ten', emoji:'🔟'},
+      {number:11, digit:'11', word:'Eleven', emoji:'⭐'}, {number:12, digit:'12', word:'Twelve', emoji:'⭐'},
+      {number:13, digit:'13', word:'Thirteen', emoji:'⭐'}, {number:14, digit:'14', word:'Fourteen', emoji:'⭐'},
+      {number:15, digit:'15', word:'Fifteen', emoji:'⭐'}, {number:16, digit:'16', word:'Sixteen', emoji:'⭐'},
+      {number:17, digit:'17', word:'Seventeen', emoji:'⭐'}, {number:18, digit:'18', word:'Eighteen', emoji:'⭐'},
+      {number:19, digit:'19', word:'Nineteen', emoji:'⭐'}, {number:20, digit:'20', word:'Twenty', emoji:'⭐'},
+    ]
+  },
+  fruits: {
+    icon:'🍓', label:'Fruits',
+    items:[
+      {name:'Apple', emoji:'🍎'}, {name:'Banana', emoji:'🍌'}, {name:'Mango', emoji:'🥭'},
+      {name:'Grapes', emoji:'🍇'}, {name:'Orange', emoji:'🍊'}, {name:'Strawberry', emoji:'🍓'},
+      {name:'Watermelon', emoji:'🍉'}, {name:'Pineapple', emoji:'🍍'}, {name:'Cherry', emoji:'🍒'},
+    ]
+  },
+  vehicles: {
+    icon:'🚗', label:'Vehicles',
+    items:[
+      {name:'Car', emoji:'🚗'}, {name:'Bus', emoji:'🚌'}, {name:'Train', emoji:'🚆'},
+      {name:'Bicycle', emoji:'🚲'}, {name:'Airplane', emoji:'✈️'}, {name:'Ship', emoji:'🚢'},
+      {name:'Tractor', emoji:'🚜'}, {name:'Scooter', emoji:'🛵'}, {name:'Ambulance', emoji:'🚑'},
+    ]
+  },
+  shapes: {
+    icon:'🔺', label:'Shapes',
+    items:[
+      {name:'Circle', emoji:'●'}, {name:'Square', emoji:'■'}, {name:'Triangle', emoji:'▲'},
+      {name:'Star', emoji:'⭐'}, {name:'Heart', emoji:'♥'}, {name:'Rectangle', emoji:'▭'},
+      {name:'Oval', emoji:'⬭'}, {name:'Diamond', emoji:'◆'},
+    ]
+  },
+  animals: {
+    icon:'🐾', label:'Animals',
+    items:[
+      {name:'Cat', emoji:'🐱'}, {name:'Dog', emoji:'🐶'}, {name:'Lion', emoji:'🦁'},
+      {name:'Elephant', emoji:'🐘'}, {name:'Monkey', emoji:'🐵'}, {name:'Rabbit', emoji:'🐰'},
+      {name:'Cow', emoji:'🐄'}, {name:'Fish', emoji:'🐟'}, {name:'Tiger', emoji:'🐯'}, {name:'Bird', emoji:'🐦'},
+    ]
+  },
+  bodyparts: {
+    icon:'✋', label:'Body Parts',
+    items:[
+      {name:'Head', emoji:'🙂'}, {name:'Eyes', emoji:'👀'}, {name:'Nose', emoji:'👃'},
+      {name:'Mouth', emoji:'👄'}, {name:'Ear', emoji:'👂'}, {name:'Hand', emoji:'✋'},
+      {name:'Foot', emoji:'🦶'}, {name:'Arm', emoji:'💪'}, {name:'Leg', emoji:'🦵'},
+      {name:'Hair', emoji:'💇'}, {name:'Tooth', emoji:'🦷'}, {name:'Tongue', emoji:'👅'},
+    ]
+  }
+};
+
+const BABY_LEVELS = {
+  alphabets: [
+    {label:'A → A', left:'upper', answer:'upper', hint:'Capital letter to capital letter'},
+    {label:'a → a', left:'lower', answer:'lower', hint:'Small letter to small letter'},
+    {label:'A → a', left:'upper', answer:'lower', hint:'Capital letter to small letter'},
+    {label:'a → A', left:'lower', answer:'upper', hint:'Small letter to capital letter'},
+    {label:'🍎 → A', left:'picture', answer:'upper', hint:'Picture to capital letter'},
+    {label:'A → 🍎', left:'upper', answer:'pictureName', hint:'Letter to picture word'},
+    {label:'Aa → 🍎', left:'pair', answer:'pictureName', hint:'Big and small combo'},
+  ],
+  numbers: [
+    {label:'1 → 1', left:'digit', answer:'digit', hint:'Number to number'},
+    {label:'one → one', left:'word', answer:'word', hint:'Number word to number word'},
+    {label:'1 → one', left:'digit', answer:'word', hint:'Digit to word'},
+    {label:'one → 1', left:'word', answer:'digit', hint:'Word to digit'},
+    {label:'stars → 1', left:'count', answer:'digit', hint:'Count and pick digit'},
+    {label:'1 → stars', left:'digit', answer:'count', hint:'Digit to counted stars'},
+  ],
+  default: [
+    {label:'Picture → Word', left:'picture', answer:'name', hint:'Picture to word'},
+    {label:'Word → Picture', left:'name', answer:'picture', hint:'Word to picture'},
+    {label:'Picture → Picture', left:'picture', answer:'picture', hint:'Find the same picture'},
+    {label:'Letter → Word', left:'firstUpper', answer:'name', hint:'First letter to word'},
+  ],
+};
+
+const BABY_PAIR_COLORS = ['#22c55e','#facc15','#38bdf8','#fb7185','#a78bfa','#fb923c','#2dd4bf','#f472b6'];
+const BABY_YAY = ['Yayy!', 'Super!', 'Woohoo!', 'You got it!', 'Happy sparkle!', 'Tiny genius!'];
+
+const TELUGU_VARNAMALA = [
+  {letter:'అ', sound:'a', word:'అమ్మ', hint:'amma'}, {letter:'ఆ', sound:'aa', word:'ఆవు', hint:'aavu'},
+  {letter:'ఇ', sound:'i', word:'ఇల్లు', hint:'illu'}, {letter:'ఈ', sound:'ee', word:'ఈగ', hint:'eega'},
+  {letter:'ఉ', sound:'u', word:'ఉడుత', hint:'uduta'}, {letter:'ఊ', sound:'oo', word:'ఊయల', hint:'uyala'},
+  {letter:'ఋ', sound:'ru', word:'ఋషి', hint:'rushi'}, {letter:'ఎ', sound:'e', word:'ఎలుక', hint:'eluka'},
+  {letter:'ఏ', sound:'ae', word:'ఏనుగు', hint:'enugu'}, {letter:'ఐ', sound:'ai', word:'ఐదు', hint:'aidu'},
+  {letter:'ఒ', sound:'o', word:'ఒంటె', hint:'onte'}, {letter:'ఓ', sound:'oo', word:'ఓడ', hint:'oda'},
+  {letter:'ఔ', sound:'au', word:'ఔషధం', hint:'aushadham'}, {letter:'అం', sound:'am', word:'అంకె', hint:'anke'},
+  {letter:'క', sound:'ka', word:'కలము', hint:'kalamu'}, {letter:'ఖ', sound:'kha', word:'ఖడ్గం', hint:'khadgam'},
+  {letter:'గ', sound:'ga', word:'గడియారం', hint:'gadiyaram'}, {letter:'ఘ', sound:'gha', word:'ఘంట', hint:'ghanta'},
+  {letter:'చ', sound:'cha', word:'చెట్టు', hint:'chettu'}, {letter:'ఛ', sound:'chha', word:'ఛత్రం', hint:'chatram'},
+  {letter:'జ', sound:'ja', word:'జింక', hint:'jinka'}, {letter:'ఝ', sound:'jha', word:'ఝరి', hint:'jhari'},
+  {letter:'ట', sound:'ta', word:'టమాట', hint:'tamata'}, {letter:'డ', sound:'da', word:'డమరు', hint:'damaru'},
+  {letter:'ణ', sound:'na', word:'ణ', hint:'na'}, {letter:'త', sound:'tha', word:'తలుపు', hint:'talupu'},
+  {letter:'ద', sound:'da', word:'దీపం', hint:'deepam'}, {letter:'న', sound:'na', word:'నక్షత్రం', hint:'nakshatram'},
+  {letter:'ప', sound:'pa', word:'పండు', hint:'pandu'}, {letter:'బ', sound:'ba', word:'బంతి', hint:'banthi'},
+  {letter:'మ', sound:'ma', word:'మామిడి', hint:'mamidi'}, {letter:'య', sound:'ya', word:'యానం', hint:'yanam'},
+  {letter:'ర', sound:'ra', word:'రవి', hint:'ravi'}, {letter:'ల', sound:'la', word:'లత', hint:'latha'},
+  {letter:'వ', sound:'va', word:'వాన', hint:'vaana'}, {letter:'శ', sound:'sha', word:'శంఖం', hint:'shankham'},
+  {letter:'ష', sound:'sha', word:'షట్కోణం', hint:'shatkonam'}, {letter:'స', sound:'sa', word:'సూర్యుడు', hint:'suryudu'},
+  {letter:'హ', sound:'ha', word:'హంస', hint:'hamsa'}, {letter:'ళ', sound:'la', word:'ళ', hint:'la'},
+  {letter:'క్ష', sound:'ksha', word:'క్షత్రియ', hint:'kshatriya'}, {letter:'ఱ', sound:'rra', word:'ఱ', hint:'rra'},
+];
+
+const B = {
+  mode:'mcq', category:'alphabets', level:1, score:0, streak:0,
+  selectedLeft:null, matchPairs:{}, matchMap:{},
+  flashIndex:0, flashReveal:false,
+  teluguIndex:0, answering:false, pendingNext:null,
+};
+
+TELUGU_VARNAMALA.splice(0, TELUGU_VARNAMALA.length,
+  {letter:'అ', sound:'a', word:'అమ్మ', hint:'amma'}, {letter:'ఆ', sound:'aa', word:'ఆవు', hint:'aavu'},
+  {letter:'ఇ', sound:'i', word:'ఇల్లు', hint:'illu'}, {letter:'ఈ', sound:'ee', word:'ఈగ', hint:'eega'},
+  {letter:'ఉ', sound:'u', word:'ఉడుత', hint:'uduta'}, {letter:'ఊ', sound:'oo', word:'ఊయల', hint:'uyala'},
+  {letter:'ఋ', sound:'ru', word:'ఋషి', hint:'rushi'}, {letter:'ౠ', sound:'ruu', word:'ౠ', hint:'ruu'},
+  {letter:'ఎ', sound:'e', word:'ఎలుక', hint:'eluka'}, {letter:'ఏ', sound:'ee', word:'ఏనుగు', hint:'enugu'},
+  {letter:'ఐ', sound:'ai', word:'ఐదు', hint:'aidu'}, {letter:'ఒ', sound:'o', word:'ఒంటె', hint:'onte'},
+  {letter:'ఓ', sound:'oo', word:'ఓడ', hint:'oda'}, {letter:'ఔ', sound:'au', word:'ఔషధం', hint:'aushadham'},
+  {letter:'అం', sound:'am', word:'అంకె', hint:'anke'}, {letter:'అః', sound:'aha', word:'అః', hint:'aha'},
+  {letter:'క', sound:'ka', word:'కలం', hint:'kalam'}, {letter:'ఖ', sound:'kha', word:'ఖడ్గం', hint:'khadgam'},
+  {letter:'గ', sound:'ga', word:'గడియారం', hint:'gadiyaram'}, {letter:'ఘ', sound:'gha', word:'ఘంట', hint:'ghanta'},
+  {letter:'ఙ', sound:'jna', word:'ఙ', hint:'jna'}, {letter:'చ', sound:'cha', word:'చెట్టు', hint:'chettu'},
+  {letter:'ఛ', sound:'chha', word:'ఛత్రం', hint:'chatram'}, {letter:'జ', sound:'ja', word:'జింక', hint:'jinka'},
+  {letter:'ఝ', sound:'jha', word:'ఝరి', hint:'jhari'}, {letter:'ఞ', sound:'nya', word:'ఞ', hint:'nya'},
+  {letter:'ట', sound:'ta', word:'టమాట', hint:'tamata'}, {letter:'ఠ', sound:'tha', word:'ఠ', hint:'tha'},
+  {letter:'డ', sound:'da', word:'డమరు', hint:'damaru'}, {letter:'ఢ', sound:'dha', word:'ఢ', hint:'dha'},
+  {letter:'ణ', sound:'na', word:'ణ', hint:'na'}, {letter:'త', sound:'ta', word:'తలుపు', hint:'talupu'},
+  {letter:'థ', sound:'tha', word:'థ', hint:'tha'}, {letter:'ద', sound:'da', word:'దీపం', hint:'deepam'},
+  {letter:'ధ', sound:'dha', word:'ధనం', hint:'dhanam'}, {letter:'న', sound:'na', word:'నక్షత్రం', hint:'nakshatram'},
+  {letter:'ప', sound:'pa', word:'పండు', hint:'pandu'}, {letter:'ఫ', sound:'pha', word:'ఫలం', hint:'phalam'},
+  {letter:'బ', sound:'ba', word:'బంతి', hint:'banthi'}, {letter:'భ', sound:'bha', word:'భూమి', hint:'bhoomi'},
+  {letter:'మ', sound:'ma', word:'మామిడి', hint:'mamidi'}, {letter:'య', sound:'ya', word:'యానం', hint:'yanam'},
+  {letter:'ర', sound:'ra', word:'రవి', hint:'ravi'}, {letter:'ల', sound:'la', word:'లత', hint:'latha'},
+  {letter:'వ', sound:'va', word:'వాన', hint:'vaana'}, {letter:'శ', sound:'sha', word:'శంఖం', hint:'shankham'},
+  {letter:'ష', sound:'sha', word:'షట్కోణం', hint:'shatkonam'}, {letter:'స', sound:'sa', word:'సూర్యుడు', hint:'suryudu'},
+  {letter:'హ', sound:'ha', word:'హంస', hint:'hamsa'}, {letter:'ళ', sound:'la', word:'ళ', hint:'la'},
+  {letter:'క్ష', sound:'ksha', word:'క్షమ', hint:'kshama'}, {letter:'ఱ', sound:'rra', word:'ఱ', hint:'rra'}
+);
+
+const HINDI_VARNAMALA = [
+  {letter:'अ', sound:'a', word:'अनार', hint:'anar'}, {letter:'आ', sound:'aa', word:'आम', hint:'aam'},
+  {letter:'इ', sound:'i', word:'इमली', hint:'imli'}, {letter:'ई', sound:'ee', word:'ईख', hint:'eekh'},
+  {letter:'उ', sound:'u', word:'उल्लू', hint:'ullu'}, {letter:'ऊ', sound:'oo', word:'ऊन', hint:'oon'},
+  {letter:'ऋ', sound:'ri', word:'ऋषि', hint:'rishi'}, {letter:'ए', sound:'e', word:'एक', hint:'ek'},
+  {letter:'ऐ', sound:'ai', word:'ऐनक', hint:'ainak'}, {letter:'ओ', sound:'o', word:'ओखली', hint:'okhli'},
+  {letter:'औ', sound:'au', word:'औरत', hint:'aurat'}, {letter:'अं', sound:'am', word:'अंगूर', hint:'angoor'},
+  {letter:'अः', sound:'aha', word:'अः', hint:'aha'}, {letter:'क', sound:'ka', word:'कमल', hint:'kamal'},
+  {letter:'ख', sound:'kha', word:'खरगोश', hint:'khargosh'}, {letter:'ग', sound:'ga', word:'गमला', hint:'gamla'},
+  {letter:'घ', sound:'gha', word:'घर', hint:'ghar'}, {letter:'ङ', sound:'nga', word:'ङ', hint:'nga'},
+  {letter:'च', sound:'cha', word:'चम्मच', hint:'chammach'}, {letter:'छ', sound:'chha', word:'छतरी', hint:'chhatri'},
+  {letter:'ज', sound:'ja', word:'जहाज', hint:'jahaj'}, {letter:'झ', sound:'jha', word:'झंडा', hint:'jhanda'},
+  {letter:'ञ', sound:'nya', word:'ञ', hint:'nya'}, {letter:'ट', sound:'ta', word:'टमाटर', hint:'tamatar'},
+  {letter:'ठ', sound:'tha', word:'ठेला', hint:'thela'}, {letter:'ड', sound:'da', word:'डमरू', hint:'damru'},
+  {letter:'ढ', sound:'dha', word:'ढोल', hint:'dhol'}, {letter:'ण', sound:'na', word:'ण', hint:'na'},
+  {letter:'त', sound:'ta', word:'तरबूज', hint:'tarbooj'}, {letter:'थ', sound:'tha', word:'थाली', hint:'thali'},
+  {letter:'द', sound:'da', word:'दरवाजा', hint:'darwaza'}, {letter:'ध', sound:'dha', word:'धनुष', hint:'dhanush'},
+  {letter:'न', sound:'na', word:'नल', hint:'nal'}, {letter:'प', sound:'pa', word:'पतंग', hint:'patang'},
+  {letter:'फ', sound:'pha', word:'फल', hint:'phal'}, {letter:'ब', sound:'ba', word:'बतख', hint:'batakh'},
+  {letter:'भ', sound:'bha', word:'भालू', hint:'bhalu'}, {letter:'म', sound:'ma', word:'मछली', hint:'machhli'},
+  {letter:'य', sound:'ya', word:'यज्ञ', hint:'yagya'}, {letter:'र', sound:'ra', word:'रथ', hint:'rath'},
+  {letter:'ल', sound:'la', word:'लड्डू', hint:'laddu'}, {letter:'व', sound:'va', word:'विमान', hint:'vimaan'},
+  {letter:'श', sound:'sha', word:'शेर', hint:'sher'}, {letter:'ष', sound:'sha', word:'षट्कोण', hint:'shatkon'},
+  {letter:'स', sound:'sa', word:'सूरज', hint:'suraj'}, {letter:'ह', sound:'ha', word:'हाथी', hint:'haathi'},
+  {letter:'क्ष', sound:'ksha', word:'क्षत्रिय', hint:'kshatriya'}, {letter:'त्र', sound:'tra', word:'त्रिशूल', hint:'trishul'},
+  {letter:'ज्ञ', sound:'gya', word:'ज्ञान', hint:'gyaan'}
+];
+
+Object.assign(BABY_CATEGORIES, {
+  teluguLetters: { icon:'అ', label:'Telugu', script:'telugu', items:TELUGU_VARNAMALA },
+  hindiLetters: { icon:'अ', label:'Hindi', script:'hindi', items:HINDI_VARNAMALA },
+});
+
+BABY_LEVELS.teluguLetters = [
+  {label:'అ → అ', left:'script', answer:'script', hint:'Telugu letter to the same letter'},
+  {label:'అ → a', left:'script', answer:'sound', hint:'Telugu letter to sound'},
+  {label:'a → అ', left:'sound', answer:'script', hint:'Sound to Telugu letter'},
+  {label:'అ → అమ్మ', left:'script', answer:'scriptWord', hint:'Letter to example word'},
+];
+BABY_LEVELS.hindiLetters = [
+  {label:'अ → अ', left:'script', answer:'script', hint:'Hindi letter to the same letter'},
+  {label:'अ → a', left:'script', answer:'sound', hint:'Hindi letter to sound'},
+  {label:'a → अ', left:'sound', answer:'script', hint:'Sound to Hindi letter'},
+  {label:'अ → अनार', left:'script', answer:'scriptWord', hint:'Letter to example word'},
+];
+
+const wmFile = file => `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(file)}?width=640`;
+const BABY_IMAGE_URLS = {
+  fruits: {
+    Apple:'Apple_fruit.jpg', Banana:'Bananas.jpg', Mango:'Mangoes_pic.jpg', Grapes:'Grapes03.jpg',
+    Orange:'Oranges_-_whole-halved-segment.jpg', Strawberry:'Garden_strawberry_(Fragaria_%C3%97_ananassa)_single2.jpg',
+    Watermelon:'Watermelon.jpg', Pineapple:'Pineapple_and_cross_section.jpg', Cherry:'Cherry_Stella444.jpg'
+  },
+  animals: {
+    Cat:'Cat_August_2010-4.jpg', Dog:'YellowLabradorLooking_new.jpg', Lion:'Lion_waiting_in_Namibia.jpg',
+    Elephant:'African_Bush_Elephant.jpg', Monkey:'Macaca_nigra_self-portrait_large.jpg', Rabbit:'Rabbit_in_montana.jpg',
+    Cow:'Cow_female_black_white.jpg', Fish:'Carassius_auratus.jpg', Tiger:'Panthera_tigris_tigris.jpg', Bird:'House_sparrow04.jpg'
+  },
+  vehicles: {
+    Car:'2018_Toyota_Corolla_(ZRE172R)_Ascent_sedan_(2018-11-02)_01.jpg', Bus:'Volvo_B9TL_Wright_Eclipse_Gemini_2.jpg',
+    Train:'ICE_3_Oberhaider-Wald-Tunnel.jpg', Bicycle:'Left_side_of_Flying_Pigeon.jpg', Airplane:'Airbus_A380_blue_sky.jpg',
+    Ship:'Container_ship_Colombo_Express.jpg', Tractor:'John_Deere_6320.jpg', Scooter:'Vespa_PX_200.jpg', Ambulance:'Ambulance_in_Lausanne.jpg'
+  },
+  bodyparts: {
+    Eyes:'Human_eye_with_blood_vessels.jpg', Nose:'Human_nose.jpg', Ear:'Human_ear.jpg', Hand:'Human_hand.jpg',
+    Foot:'Human_foot.jpg', Tooth:'Human_tooth.jpg'
+  }
+};
+Object.entries(BABY_IMAGE_URLS).forEach(([cat,map])=>{
+  (BABY_CATEGORIES[cat]?.items || []).forEach(item=>{
+    if(map[item.name]) item.image=wmFile(map[item.name]);
+  });
+});
+
+const BABY_STORIES = [
+  {
+    title:'The Helpful Little Seed',
+    image:wmFile('Seedling.jpg'),
+    pages:[
+      'A tiny seed slept under soft soil while the sun smiled above.',
+      'A child gave it water every day, even when nothing appeared.',
+      'One morning, two green leaves popped out and waved hello.'
+    ],
+    moral:'Small care every day can grow something wonderful.'
+  },
+  {
+    title:'The Thirsty Crow',
+    image:wmFile('The_Crow_and_the_Pitcher_-_Project_Gutenberg_etext_19994.jpg'),
+    pages:[
+      'A thirsty crow found a pot, but the water was too low.',
+      'It dropped pebbles into the pot one by one.',
+      'The water rose up, and the crow drank happily.'
+    ],
+    moral:'Smart thinking can solve big problems.'
+  },
+  {
+    title:'The Kind Lion',
+    image:wmFile('Lion_waiting_in_Namibia.jpg'),
+    pages:[
+      'A lion had a thorn in its paw and roared sadly.',
+      'A brave child helped remove the thorn gently.',
+      'The lion remembered the kindness and became a friend.'
+    ],
+    moral:'Kindness makes strong friendships.'
+  },
+  {
+    title:'The Sharing Mango',
+    image:wmFile('Mangoes_pic.jpg'),
+    pages:[
+      'Two friends found one sweet mango under a tree.',
+      'They cut it into two pieces and shared it with smiles.',
+      'The mango tasted sweeter because both hearts were happy.'
+    ],
+    moral:'Sharing makes joy bigger.'
+  }
+];
+
+// ──────────────────────────────────────────
+// HOME REFRESH
+// ──────────────────────────────────────────
+function refreshHome(){
+  const xp = save.totalXP;
+  const lvXp = xp % 100;
+  document.getElementById('home-xp-bar').style.width = lvXp + '%';
+  document.getElementById('home-xp-num').textContent  = `${xp} XP`;
+  document.getElementById('hs-streak').textContent   = save.streak;
+  document.getElementById('hs-xp').textContent       = xp;
+  document.getElementById('hs-correct').textContent  = save.totalRight;
+  document.getElementById('hs-score').textContent    = save.bestScore;
+  // mastery stars
+  ['add','sub','mul','div'].forEach(op=>{
+    const stars = document.querySelectorAll(`#stars-${op} .star-dot`);
+    const m = Math.min(5, save.mastery[op]||0);
+    stars.forEach((s,i)=> s.classList.toggle('lit', i<m));
+  });
+}
+
+// ──────────────────────────────────────────
+// MODAL
+// ──────────────────────────────────────────
+let modalOp = null;
+let modalMode = null;
+let modalLevel = 1;
+
+function openModal(op){
+  modalOp   = op;
+  modalMode = null;
+  modalLevel = G.level || 1;
+  const m = OP_META[op];
+
+  // badge
+  const badge = document.getElementById('modal-badge');
+  badge.textContent  = `${m.sym} ${m.name}`;
+  badge.style.background = m.bg;
+  badge.style.border = `1.5px solid ${m.border}`;
+  badge.style.color  = m.color;
+  badge.style.borderRadius = '30px';
+  badge.style.padding = '7px 16px';
+
+  // reset mode selection
+  document.querySelectorAll('.modal-mode-btn').forEach(b=>b.classList.remove('sel'));
+
+  // level pills
+  const pp = document.getElementById('modal-lvl-pills');
+  pp.innerHTML = '';
+  LVL.forEach((l,i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'lvl-pill' + (modalLevel===i+1?' sel':'');
+    btn.textContent = `${i+1} ${l.s}`;
+    btn.onclick = ()=>{
+      modalLevel=i+1;
+      pp.querySelectorAll('.lvl-pill').forEach((b,j)=>b.classList.toggle('sel',j===i));
+    };
+    pp.appendChild(btn);
+  });
+
+  document.getElementById('modal-play').disabled = true;
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal(){
+  document.getElementById('modal').classList.remove('open');
+}
+function overlayClick(e){
+  if(e.target===document.getElementById('modal')) closeModal();
+}
+
+function pickMode(m){
+  modalMode = m;
+  document.querySelectorAll('.modal-mode-btn').forEach(b=>{
+    b.classList.toggle('sel', b.dataset.mode===m);
+  });
+  document.getElementById('modal-play').disabled = false;
+}
+
+// ──────────────────────────────────────────
+// START GAME
+// ──────────────────────────────────────────
+function startGame(){
+  G.op      = modalOp;
+  G.mode    = modalMode;
+  G.level   = modalLevel;
+  G.score   = 0; G.correct=0; G.wrong=0; G.streak=0;
+  G.xpSession = 0; G.done = 0; G.hearts = 5;
+  G.matchBatch = 0;
+  closeModal();
+  document.getElementById('home').style.display='none';
+  const gEl = document.getElementById('game');
+  gEl.classList.add('active');
+  buildLvDropdown();
+  refreshNav();
+  renderHearts();
+  updateGameBar();
+  document.getElementById('game-body').innerHTML='';
+  nextQ();
+}
+
+function goHome(){
+  document.getElementById('game').classList.remove('active');
+  document.getElementById('baby-screen').classList.remove('active');
+  clearBabyCelebrate();
+  B.pendingNext=null;
+  document.getElementById('home').style.display='';
+  refreshHome();
+}
+
+// ──────────────────────────────────────────
+// NAV SWITCHING
+// ──────────────────────────────────────────
+function navOp(op){
+  G.op=op; G.matchBatch=0;
+  refreshNav(); resetFeed(); nextQ();
+  showToast(`Switched to ${OP_META[op].sym} ${OP_META[op].name}`);
+}
+function navMode(m){
+  G.mode=m; G.matchBatch=0;
+  refreshNav(); resetFeed(); nextQ();
+  const labels={mcq:'Multiple Choice',fill:'Fill in Blank',match:'Match'};
+  showToast(`Mode: ${labels[m]}`);
+}
+function resetFeed(){
+  document.getElementById('game-body').innerHTML='';
+  G.answering=false;
+}
+
+function refreshNav(){
+  document.querySelectorAll('[data-nop]').forEach(b=>{
+    b.classList.toggle('gact', b.dataset.nop===G.op);
+  });
+  document.querySelectorAll('[data-nm]').forEach(b=>{
+    b.classList.toggle('gact', b.dataset.nm===G.mode);
+  });
+  document.getElementById('gnav-lv-lbl').textContent = `Lv.${G.level}`;
+  document.querySelectorAll('.gnav-lv-opt').forEach(b=>{
+    b.classList.toggle('sel', parseInt(b.dataset.lv)===G.level);
+  });
+  const sv = document.getElementById('g-score');
+  sv.textContent=G.score; sv.classList.remove('pop');
+  void sv.offsetWidth; sv.classList.add('pop');
+  const sc = document.getElementById('g-streak');
+  sc.textContent = `${G.streak>=5?'🔥':'⭐'} ${G.streak}`;
+  sc.className = 'streak-chip'+(G.streak>=5?' hot':'');
+}
+
+// level dropdown
+function buildLvDropdown(){
+  const drop=document.getElementById('gnav-lv-drop');
+  drop.innerHTML='';
+  LVL.forEach((l,i)=>{
+    const b=document.createElement('button');
+    b.className='gnav-lv-opt'+(G.level===i+1?' sel':'');
+    b.dataset.lv=i+1;
+    b.textContent=`${i+1} ${l.s}`;
+    b.onclick=()=>{ G.level=i+1; closeLvDrop(); refreshNav(); resetFeed(); nextQ(); showToast(`Level ${i+1} — ${l.s}`); };
+    drop.appendChild(b);
+  });
+}
+function toggleLvDrop(){
+  const drop=document.getElementById('gnav-lv-drop');
+  const btn=document.getElementById('gnav-lv-btn');
+  const open=drop.classList.toggle('open');
+  btn.classList.toggle('open',open);
+  if(open){
+    const close=e=>{ if(!btn.contains(e.target)&&!drop.contains(e.target)){closeLvDrop();document.removeEventListener('click',close);}};
+    setTimeout(()=>document.addEventListener('click',close),10);
+  }
+}
+function closeLvDrop(){
+  document.getElementById('gnav-lv-drop').classList.remove('open');
+  document.getElementById('gnav-lv-btn').classList.remove('open');
+}
+
+// hearts
+function renderHearts(){
+  const hr=document.getElementById('hearts-row');
+  hr.innerHTML='';
+  for(let i=0;i<5;i++){
+    const h=document.createElement('span');
+    h.className='heart'+(i>=G.hearts?' lost':'');
+    h.textContent='❤️'; hr.appendChild(h);
+  }
+}
+
+function updateGameBar(){
+  const pct=Math.min(100,G.done*5);
+  document.getElementById('gbar').style.width=pct+'%';
+  document.getElementById('gbar-done').textContent=`${G.done} done`;
+  document.getElementById('gbar-xp').textContent=`+${G.xpSession} XP this session`;
+}
+
+// ──────────────────────────────────────────
+// QUESTION GENERATION
+// ──────────────────────────────────────────
+function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+function genQ(){
+  const cfg=LVL[G.level-1];
+  let a,b,ans,expr;
+  const dec=cfg.dec&&Math.random()<.25&&(G.op==='add'||G.op==='sub');
+  if(dec){ a=parseFloat((Math.random()*cfg.maxA).toFixed(1)); b=parseFloat((Math.random()*cfg.maxB).toFixed(1)); }
+  else   { a=rnd(1,cfg.maxA); b=rnd(1,cfg.maxB); }
+  if(G.op==='add'){ ans=parseFloat((a+b).toFixed(2)); expr=`${a} + ${b}`; }
+  else if(G.op==='sub'){ if(!cfg.neg&&b>a)[a,b]=[b,a]; ans=parseFloat((a-b).toFixed(2)); expr=`${a} − ${b}`; }
+  else if(G.op==='mul'){ b=rnd(1,Math.min(cfg.maxB,G.level<5?12:99)); ans=a*b; expr=`${a} × ${b}`; }
+  else{ b=rnd(1,G.level<4?10:20); a=b*rnd(1,G.level<4?10:50); ans=a/b; expr=`${a} ÷ ${b}`; }
+  return{ans,expr};
+}
+function distractors(ans){
+  const s=new Set();
+  const offs=[1,2,3,5,7,4,10,8,6,9,15,11];
+  let i=0;
+  while(s.size<3){ const o=offs[i%offs.length]*(Math.random()<.5?1:-1); const w=parseFloat((ans+o).toFixed(2)); if(w!==ans)s.add(w); i++; }
+  return shuffle([ans,...s]);
+}
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=rnd(0,i);[b[i],b[j]]=[b[j],b[i]];}return b;}
+
+// BABY MODE PLAYGROUND
+function startBaby(mode='mcq'){
+  closeModal();
+  document.getElementById('game').classList.remove('active');
+  document.getElementById('home').style.display='none';
+  document.getElementById('baby-screen').classList.add('active');
+  B.mode=mode; B.score=0; B.streak=0; B.answering=false;
+  B.selectedLeft=null; B.matchPairs={}; B.matchMap={}; B.flashReveal=false;
+  renderBaby();
+}
+
+function babySwitchMode(mode){
+  B.mode=mode; B.answering=false; B.selectedLeft=null; B.flashReveal=false;
+  B.matchPairs={}; B.matchMap={};
+  renderBaby();
+}
+
+function babyPickCategory(cat){
+  B.category=cat; B.answering=false; B.selectedLeft=null;
+  renderBaby();
+}
+
+function renderBaby(){
+  const act=BABY_ACTIVITIES[B.mode];
+  document.getElementById('baby-nav-name').textContent=`${act.icon} ${act.name}`;
+  document.getElementById('baby-nav-sub').textContent=act.sub;
+  babyUpdateScore();
+
+  document.querySelectorAll('[data-baby-mode]').forEach(btn=>{
+    btn.classList.toggle('bact-active', btn.dataset.babyMode===B.mode);
+  });
+
+  const catRow=document.getElementById('baby-category-row');
+  const showCats=['mcq','fill','match'].includes(B.mode);
+  catRow.style.display=showCats?'flex':'none';
+  catRow.innerHTML='';
+  if(showCats){
+    Object.entries(BABY_CATEGORIES).forEach(([key,cat])=>{
+      const btn=document.createElement('button');
+      btn.className='baby-chip'+(B.category===key?' bcat-active':'');
+      btn.textContent=`${cat.icon} ${cat.label}`;
+      btn.onclick=()=>babyPickCategory(key);
+      catRow.appendChild(btn);
+    });
+  }
+
+  if(B.mode==='mcq') renderBabyMCQ();
+  else if(B.mode==='fill') renderBabyFill();
+  else if(B.mode==='match') renderBabyMatch();
+  else if(B.mode==='flash') renderBabyFlash();
+  else renderBabyTelugu();
+}
+
+function babyUpdateScore(){
+  document.getElementById('baby-score').textContent=B.score;
+}
+
+function babyItems(){ return BABY_CATEGORIES[B.category].items; }
+function babyPickItem(){ const items=babyItems(); return items[rnd(0,items.length-1)]; }
+function babyAnswerText(item){ return item.letter ? `${item.letter} ${item.small} - ${item.name}` : `${item.emoji} ${item.name}`; }
+function babyChoiceSet(correct, count=4){
+  const pool=shuffle(babyItems().filter(item=>item!==correct)).slice(0,count-1);
+  return shuffle([correct,...pool]);
+}
+
+function babyStageHTML(prompt, hero){
+  const cat=BABY_CATEGORIES[B.category];
+  return `
+    <section class="baby-card-stage">
+      <div class="baby-stage-top">
+        <span class="baby-badge">${BABY_ACTIVITIES[B.mode].icon} ${BABY_ACTIVITIES[B.mode].name}</span>
+        <span class="baby-mini-stat">${cat.icon} ${cat.label} · Streak ${B.streak}</span>
+      </div>
+      <div class="baby-prompt">${prompt}</div>
+      ${hero}
+      <div id="baby-work"></div>
+      <div id="baby-result"></div>
+    </section>
+  `;
+}
+
+function renderBabyMCQ(){
+  B.answering=false;
+  const item=babyPickItem();
+  const prompt=item.letter ? `Which letter begins ${item.emoji} ${item.name}?` : `Which one is ${item.name}?`;
+  const hero=`
+    <div class="baby-hero">
+      <div class="baby-visual">${item.emoji}</div>
+      <div>
+        <div class="baby-word">${item.letter ? item.name : item.emoji}</div>
+        <div class="baby-subtle">${item.letter ? 'Find the big and small letter pair.' : 'Look for the matching picture word.'}</div>
+      </div>
+    </div>
+  `;
+  document.getElementById('baby-body').innerHTML=babyStageHTML(prompt, hero);
+
+  const grid=document.createElement('div');
+  grid.className='baby-choice-grid';
+  babyChoiceSet(item).forEach(choice=>{
+    const btn=document.createElement('button');
+    btn.className='baby-choice';
+    btn.innerHTML=item.letter
+      ? `<span class="baby-choice-ico">${choice.letter}${choice.small}</span><span>${choice.name}</span>`
+      : `<span class="baby-choice-ico">${choice.emoji}</span><span>${choice.name}</span>`;
+    btn.onclick=()=>babyCheckMCQ(item,choice,btn);
+    grid.appendChild(btn);
+  });
+  document.getElementById('baby-work').appendChild(grid);
+}
+
+function babyCheckMCQ(correct, chosen, btn){
+  if(B.answering)return;
+  B.answering=true;
+  const ok=correct===chosen;
+  document.querySelectorAll('.baby-choice').forEach(b=>b.disabled=true);
+  btn.classList.add(ok?'hit':'miss');
+  if(!ok){
+    document.querySelectorAll('.baby-choice').forEach(b=>{
+      if(b.textContent.includes(correct.name) || (correct.letter && b.textContent.includes(correct.letter))) b.classList.add('show');
+    });
+  }
+  babyFeedback(ok, babyAnswerText(correct), ()=>renderBabyMCQ());
+}
+
+function renderBabyFill(){
+  B.answering=false;
+  const item=babyPickItem();
+  const answer=(item.letter || item.name[0]).toLowerCase();
+  const masked='_' + item.name.slice(1);
+  const prompt=`Fill the first letter for ${item.emoji}`;
+  const hero=`
+    <div class="baby-hero">
+      <div class="baby-visual">${item.emoji}</div>
+      <div>
+        <div class="baby-word">${masked}</div>
+        <div class="baby-subtle">Tiny clue: ${item.name.length} letters</div>
+      </div>
+    </div>
+  `;
+  document.getElementById('baby-body').innerHTML=babyStageHTML(prompt, hero);
+
+  const row=document.createElement('div');
+  row.className='baby-fill-row';
+  const inp=document.createElement('input');
+  inp.className='baby-fill-input';
+  inp.type='text'; inp.maxLength=20; inp.placeholder='Letter';
+  const sub=document.createElement('button');
+  sub.className='baby-fill-submit'; sub.textContent='Check ✓';
+  const check=()=>babyCheckFill(item,answer,inp,sub);
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')check();});
+  sub.onclick=check;
+  row.append(inp,sub);
+  document.getElementById('baby-work').appendChild(row);
+  setTimeout(()=>inp.focus(),80);
+}
+
+function babyCheckFill(item, answer, inp, sub){
+  if(B.answering)return;
+  const val=inp.value.trim().toLowerCase();
+  if(!val){ inp.focus(); return; }
+  B.answering=true; inp.disabled=true; sub.disabled=true;
+  const ok=val===answer || val===item.name.toLowerCase();
+  inp.style.borderColor=ok?'var(--green)':'var(--red)';
+  babyFeedback(ok, babyAnswerText(item), ()=>renderBabyFill());
+}
+
+function renderBabyMatch(){
+  B.answering=false; B.selectedLeft=null; B.matchPairs={};
+  const left=shuffle(babyItems()).slice(0,4);
+  const right=shuffle(left);
+  B.matchLeft=left; B.matchRight=right;
+  const cat=BABY_CATEGORIES[B.category];
+  document.getElementById('baby-body').innerHTML=`
+    <section class="baby-card-stage">
+      <div class="baby-stage-top">
+        <span class="baby-badge">🧩 Match Pairs</span>
+        <span class="baby-mini-stat">${cat.icon} ${cat.label} · Streak ${B.streak}</span>
+      </div>
+      <div class="baby-prompt">Tap a picture, then tap its word</div>
+      <div class="baby-match-grid">
+        <div class="baby-match-col" id="baby-match-left"></div>
+        <div class="baby-match-col" id="baby-match-right"></div>
+      </div>
+      <div id="baby-result"></div>
+    </section>
+  `;
+  const lc=document.getElementById('baby-match-left');
+  const rc=document.getElementById('baby-match-right');
+  left.forEach((item,i)=>{
+    const tile=document.createElement('button');
+    tile.className='baby-match-tile';
+    tile.dataset.left=i;
+    tile.innerHTML=item.letter ? `<span>${item.emoji}</span><span>${item.letter}${item.small}</span>` : `<span style="font-size:2rem">${item.emoji}</span>`;
+    tile.onclick=()=>babyMatchLeft(i);
+    lc.appendChild(tile);
+  });
+  right.forEach((item,i)=>{
+    const tile=document.createElement('button');
+    tile.className='baby-match-tile';
+    tile.dataset.right=i;
+    tile.textContent=item.name;
+    tile.onclick=()=>babyMatchRight(i);
+    rc.appendChild(tile);
+  });
+}
+
+function babyMatchLeft(i){
+  if(B.matchPairs[i]!==undefined)return;
+  B.selectedLeft=i;
+  document.querySelectorAll('[data-left]').forEach(tile=>tile.classList.toggle('sel', parseInt(tile.dataset.left)===i));
+}
+
+function babyMatchRight(ri){
+  if(B.selectedLeft===null)return;
+  const li=B.selectedLeft;
+  if(B.matchPairs[li]!==undefined || Object.values(B.matchPairs).includes(ri))return;
+  const ok=B.matchLeft[li]===B.matchRight[ri];
+  const lEl=document.querySelector(`[data-left="${li}"]`);
+  const rEl=document.querySelector(`[data-right="${ri}"]`);
+  if(ok){
+    B.matchPairs[li]=ri; B.selectedLeft=null;
+    lEl.classList.remove('sel'); lEl.classList.add('done'); rEl.classList.add('done');
+    confetti(5);
+    if(Object.keys(B.matchPairs).length===B.matchLeft.length){
+      B.score+=20; B.streak++; save.babyXP=(save.babyXP||0)+20; persist(); babyUpdateScore();
+      document.getElementById('baby-result').innerHTML=`
+        <div class="baby-result ok"><span>🎉</span><span>All pairs matched! +20 stars</span></div>
+        <button class="continue-btn c-correct" onclick="renderBabyMatch()">New Match →</button>
+      `;
+      confetti(18);
+    }
+  } else {
+    B.streak=0; B.selectedLeft=null;
+    lEl.classList.remove('sel'); lEl.classList.add('bad'); rEl.classList.add('bad');
+    setTimeout(()=>{ lEl.classList.remove('bad'); rEl.classList.remove('bad'); },520);
+  }
+}
+
+function renderBabyFlash(){
+  const items=BABY_CATEGORIES.alphabets.items;
+  const item=items[B.flashIndex%items.length];
+  document.getElementById('baby-body').innerHTML=`
+    <section class="baby-card-stage">
+      <div class="baby-stage-top">
+        <span class="baby-badge">⚡ ABC Flash</span>
+        <span class="baby-mini-stat">Card ${B.flashIndex+1} / ${items.length}</span>
+      </div>
+      <div class="baby-prompt">Guess what pops from this letter</div>
+      <div class="baby-flash-card flash-pop">
+        <div class="baby-flash-letter">${item.letter} ${item.small}</div>
+        ${B.flashReveal
+          ? `<div class="baby-flash-object">${item.emoji}</div><div class="baby-flash-word">${item.name}</div>`
+          : `<div class="baby-flash-object">?</div><div class="baby-subtle">Peek when you are ready</div>`}
+      </div>
+      <div class="baby-flash-actions">
+        <button class="baby-mini-btn" onclick="babyFlashStep(-1)">← Back</button>
+        <button class="baby-mini-btn" onclick="babyRevealFlash()">Peek</button>
+        <button class="baby-mini-btn" onclick="babySpeak('${item.letter} for ${item.name}','en-US')">Say</button>
+        <button class="baby-mini-btn" onclick="babyFlashStep(1)">Next →</button>
+      </div>
+    </section>
+  `;
+}
+
+function babyRevealFlash(){
+  if(!B.flashReveal){ B.score+=2; babyUpdateScore(); confetti(6); }
+  B.flashReveal=true;
+  renderBabyFlash();
+}
+
+function babyFlashStep(step){
+  B.flashIndex=(B.flashIndex+step+BABY_CATEGORIES.alphabets.items.length)%BABY_CATEGORIES.alphabets.items.length;
+  B.flashReveal=false;
+  renderBabyFlash();
+}
+
+function babyNextFlash(){ babyFlashStep(1); }
+
+function renderBabyTelugu(){
+  renderScriptFlash('telugu');
+}
+
+function renderBabyHindi(){
+  renderScriptFlash('hindi');
+}
+
+function renderScriptFlash(script){
+  const isHindi=script==='hindi';
+  const items=isHindi?HINDI_VARNAMALA:TELUGU_VARNAMALA;
+  const idxKey=isHindi?'hindiIndex':'teluguIndex';
+  B[idxKey]=B[idxKey]||0;
+  const item=items[B[idxKey]%items.length];
+  const categoryKey=isHindi?'hindiLetters':'teluguLetters';
+  const letterClass=isHindi?'script-letter-hindi':'telugu-letter';
+  const tileClass=isHindi?'script-tile hindi':'script-tile';
+  const title=isHindi?'Hindi Varnamala':'Telugu Varnamala';
+  const speakLang=isHindi?'hi-IN':'te-IN';
+  document.getElementById('baby-body').innerHTML=`
+    <section class="baby-card-stage">
+      <div class="baby-stage-top">
+        <span class="baby-badge">${isHindi?'अ':'అ'} ${title}</span>
+        <span class="baby-mini-stat">Letter ${B[idxKey]+1} / ${items.length}</span>
+      </div>
+      <div class="baby-prompt">Tap, say, practice, and play</div>
+      <div class="telugu-card script-card">
+        <div class="${letterClass}">${item.letter}</div>
+        <div class="telugu-sound">${item.sound}</div>
+        <div class="telugu-word">${item.word}</div>
+        <div class="baby-subtle">${item.hint}</div>
+      </div>
+      <div class="baby-flash-actions">
+        <button class="baby-mini-btn" onclick="babyScriptStep('${script}',-1)">← Back</button>
+        <button class="baby-mini-btn" onclick="babySpeak('${item.letter} ${item.word}','${speakLang}')">Say</button>
+        <button class="baby-mini-btn" onclick="babyScriptStep('${script}',1)">Next →</button>
+        <button class="baby-mini-btn" onclick="babyPracticeScript('${categoryKey}','mcq')">Quiz</button>
+        <button class="baby-mini-btn" onclick="babyPracticeScript('${categoryKey}','fill')">Fill</button>
+        <button class="baby-mini-btn" onclick="babyPracticeScript('${categoryKey}','match')">Match</button>
+      </div>
+      <div class="script-grid" id="script-grid"></div>
+    </section>
+  `;
+  const grid=document.getElementById('script-grid');
+  items.forEach((l,i)=>{
+    const btn=document.createElement('button');
+    btn.className=tileClass+(i===B[idxKey]?' active':'');
+    btn.textContent=l.letter;
+    btn.onclick=()=>{ B[idxKey]=i; B.score+=1; babyUpdateScore(); renderScriptFlash(script); };
+    grid.appendChild(btn);
+  });
+}
+
+function babyScriptStep(script, step){
+  const items=script==='hindi'?HINDI_VARNAMALA:TELUGU_VARNAMALA;
+  const idxKey=script==='hindi'?'hindiIndex':'teluguIndex';
+  B[idxKey]=(B[idxKey]||0)+step;
+  B[idxKey]=(B[idxKey]+items.length)%items.length;
+  B.score+=1; babyUpdateScore();
+  renderScriptFlash(script);
+}
+
+function babyTeluguStep(step){ babyScriptStep('telugu', step); }
+
+function babyPracticeScript(category, mode){
+  B.category=category;
+  B.level=1;
+  B.mode=mode;
+  renderBaby();
+}
+
+function renderBabyStory(){
+  B.storyIndex=B.storyIndex||0;
+  B.storyPage=B.storyPage||0;
+  const story=BABY_STORIES[B.storyIndex % BABY_STORIES.length];
+  B.storyPage=Math.max(0, Math.min(B.storyPage, story.pages.length-1));
+  const page=story.pages[B.storyPage];
+  document.getElementById('baby-body').innerHTML=`
+    <section class="baby-card-stage">
+      <div class="baby-stage-top">
+        <span class="baby-badge">📖 Story Book</span>
+        <span class="baby-mini-stat">Page ${B.storyPage+1} / ${story.pages.length}</span>
+      </div>
+      <div class="story-shell">
+        <div class="story-frame">
+          <img src="${story.image}" alt="${story.title}" loading="lazy">
+        </div>
+        <div class="story-panel">
+          <div class="story-title">${story.title}</div>
+          <div class="story-text">${page}</div>
+          ${B.storyPage===story.pages.length-1?`<div class="story-moral">Moral: ${story.moral}</div>`:''}
+          <div class="story-actions">
+            <button class="baby-mini-btn" onclick="babyStoryStep(-1)">← Back</button>
+            <button class="baby-mini-btn" onclick="babySpeak('${page.replace(/'/g,"\\'")}','en-US')">Read</button>
+            <button class="baby-mini-btn" onclick="babyStoryStep(1)">Next →</button>
+            <button class="baby-mini-btn" onclick="babyStorySurprise()">Sparkle</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function babyStoryStep(step){
+  const story=BABY_STORIES[B.storyIndex % BABY_STORIES.length];
+  B.storyPage=(B.storyPage||0)+step;
+  if(B.storyPage>=story.pages.length){
+    B.storyIndex=(B.storyIndex+1)%BABY_STORIES.length;
+    B.storyPage=0;
+  }
+  if(B.storyPage<0){
+    B.storyIndex=(B.storyIndex-1+BABY_STORIES.length)%BABY_STORIES.length;
+    B.storyPage=BABY_STORIES[B.storyIndex].pages.length-1;
+  }
+  babyRain(8);
+  renderBaby();
+}
+
+function babyStorySurprise(){
+  B.score+=5; babyUpdateScore();
+  babyRain(24); confetti(12);
+}
+
+function babyFeedback(ok, answerText, nextFn){
+  if(ok){ B.score+=10; B.streak++; save.babyXP=(save.babyXP||0)+10; persist(); confetti(10); }
+  else { B.streak=0; }
+  babyUpdateScore();
+  document.getElementById('baby-result').innerHTML=`
+    <div class="baby-result ${ok?'ok':'no'}">
+      <span>${ok?'✅':'💡'}</span>
+      <span>${ok?pickPraise()+' +10 stars':'Answer: '+answerText}</span>
+    </div>
+    <button class="continue-btn ${ok?'c-correct':'c-wrong'}" id="baby-next-btn">${ok?'Next →':'Try another →'}</button>
+  `;
+  document.getElementById('baby-next-btn').onclick=nextFn;
+}
+
+function babySpeak(text, lang='en-US'){
+  if(!('speechSynthesis' in window)) return;
+  const utter=new SpeechSynthesisUtterance(text);
+  utter.lang=lang; utter.rate=.82; utter.pitch=1.08;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utter);
+}
+
+// BABY MODE LEVEL UPDATE
+function startBaby(mode='mcq', category=null){
+  closeModal();
+  clearBabyCelebrate();
+  document.getElementById('game').classList.remove('active');
+  document.getElementById('home').style.display='none';
+  document.getElementById('baby-screen').classList.add('active');
+  B.mode=mode;
+  if(category){ B.category=category; B.level=1; }
+  else B.level=Math.min(B.level||1, babyLevels().length);
+  B.score=0; B.streak=0; B.answering=false; B.pendingNext=null;
+  B.selectedLeft=null; B.matchPairs={}; B.matchMap={}; B.flashReveal=false;
+  renderBaby();
+}
+
+function babySwitchMode(mode){
+  clearBabyCelebrate();
+  B.mode=mode; B.answering=false; B.pendingNext=null; B.selectedLeft=null; B.flashReveal=false;
+  B.matchPairs={}; B.matchMap={};
+  if(['telugu','hindi','story'].includes(mode)) B.level=1;
+  else B.level=Math.min(B.level||1, babyLevels().length);
+  renderBaby();
+}
+
+function babyPickCategory(cat){
+  clearBabyCelebrate();
+  B.category=cat; B.level=1; B.answering=false; B.pendingNext=null; B.selectedLeft=null;
+  renderBaby();
+}
+
+function babySwitchLevel(level){
+  clearBabyCelebrate();
+  B.level=level; B.answering=false; B.pendingNext=null; B.selectedLeft=null;
+  renderBaby();
+}
+
+function renderBaby(){
+  const act=BABY_ACTIVITIES[B.mode];
+  document.getElementById('baby-nav-name').textContent=`${act.icon} ${act.name}`;
+  document.getElementById('baby-nav-sub').textContent=act.sub;
+  babyUpdateScore();
+
+  document.querySelectorAll('[data-baby-mode]').forEach(btn=>{
+    btn.classList.toggle('bact-active', btn.dataset.babyMode===B.mode);
+  });
+
+  const showPractice=['mcq','fill','match'].includes(B.mode);
+  const catRow=document.getElementById('baby-category-row');
+  catRow.style.display=showPractice?'flex':'none';
+  catRow.innerHTML='';
+  if(showPractice){
+    Object.entries(BABY_CATEGORIES).forEach(([key,cat])=>{
+      const btn=document.createElement('button');
+      btn.className='baby-chip'+(B.category===key?' bcat-active':'');
+      btn.textContent=`${cat.icon} ${cat.label}`;
+      btn.onclick=()=>babyPickCategory(key);
+      catRow.appendChild(btn);
+    });
+  }
+
+  const levelRow=document.getElementById('baby-level-row');
+  levelRow.style.display=showPractice?'flex':'none';
+  levelRow.innerHTML='';
+  if(showPractice){
+    babyLevels().forEach((level,i)=>{
+      const btn=document.createElement('button');
+      btn.className='baby-level-chip'+(B.level===i+1?' blvl-active':'');
+      btn.textContent=`Lv.${i+1} ${level.label}`;
+      btn.title=level.hint;
+      btn.onclick=()=>babySwitchLevel(i+1);
+      levelRow.appendChild(btn);
+    });
+  }
+
+  const storyRow=document.getElementById('baby-story-row');
+  storyRow.style.display=B.mode==='story'?'flex':'none';
+  storyRow.innerHTML='';
+  if(B.mode==='story'){
+    BABY_STORIES.forEach((story,i)=>{
+      const btn=document.createElement('button');
+      btn.className='baby-chip'+((B.storyIndex||0)===i?' bcat-active':'');
+      btn.textContent=`📖 ${story.title}`;
+      btn.onclick=()=>{ B.storyIndex=i; B.storyPage=0; renderBabyStory(); };
+      storyRow.appendChild(btn);
+    });
+  }
+
+  if(B.mode==='mcq') renderBabyMCQ();
+  else if(B.mode==='fill') renderBabyFill();
+  else if(B.mode==='match') renderBabyMatch();
+  else if(B.mode==='flash') renderBabyFlash();
+  else if(B.mode==='telugu') renderBabyTelugu();
+  else if(B.mode==='hindi') renderBabyHindi();
+  else renderBabyStory();
+}
+
+function babyLevels(){
+  return BABY_LEVELS[B.category] || BABY_LEVELS.default;
+}
+
+function babyLevelCfg(){
+  const levels=babyLevels();
+  if(B.level<1 || B.level>levels.length) B.level=1;
+  return levels[B.level-1];
+}
+
+function babyItems(){
+  const cfg=babyLevelCfg();
+  const items=BABY_CATEGORIES[B.category].items;
+  if(B.category==='numbers' && (cfg.left==='count' || cfg.answer==='count')){
+    return items.filter(item=>item.number<=10);
+  }
+  return items;
+}
+
+function babyPickItem(){
+  const items=babyItems();
+  return items[rnd(0,items.length-1)];
+}
+
+function babyChoiceSet(correct, count=4){
+  const pool=shuffle(babyItems().filter(item=>item!==correct)).slice(0,count-1);
+  return shuffle([correct,...pool]);
+}
+
+function babyToken(item, type){
+  const name=item.name || item.word || '';
+  if(type==='upper') return {html:`<span class="baby-token big">${item.letter}</span>`, text:item.letter, plain:item.letter};
+  if(type==='lower') return {html:`<span class="baby-token big">${item.small}</span>`, text:item.small, plain:item.small};
+  if(type==='pair') return {html:`<span class="baby-token big">${item.letter}${item.small}</span>`, text:`${item.letter} ${item.small}`, plain:`${item.letter}${item.small}`};
+  if(type==='script') return {html:`<span class="baby-token big">${item.letter}</span>`, text:item.letter, plain:item.letter};
+  if(type==='sound') return {html:`<span class="baby-token word">${item.sound}</span>`, text:item.sound, plain:item.sound};
+  if(type==='scriptWord') return {html:`<span class="baby-token word">${item.word}</span>`, text:item.word, plain:item.word};
+  if(type==='digit') return {html:`<span class="baby-token big">${item.digit}</span>`, text:item.digit, plain:item.digit};
+  if(type==='word') return {html:`<span class="baby-token word">${item.word}</span>`, text:item.word, plain:item.word};
+  if(type==='count'){
+    const stars=Array.from({length:item.number},()=>'<span>⭐</span>').join('');
+    return {html:`<span class="baby-token count">${stars}</span>`, text:`${item.number} stars`, plain:item.digit};
+  }
+  if(type==='firstUpper') return {html:`<span class="baby-token big">${name[0].toUpperCase()}</span>`, text:name[0].toUpperCase(), plain:name[0].toUpperCase()};
+  if(type==='picture') return {html:babyPictureHTML(item), text:name || item.digit, plain:name || item.digit};
+  if(type==='pictureName') return {html:`<span class="baby-token stack">${babyPictureHTML(item,'small')}<span>${name}</span></span>`, text:name, plain:name};
+  return {html:`<span class="baby-token word">${name}</span>`, text:name, plain:name};
+}
+
+function babyPictureHTML(item, size='big'){
+  if(item.image){
+    return `<img class="baby-img" src="${item.image}" alt="${item.name || item.word || 'picture'}" loading="lazy" onerror="this.replaceWith(document.createTextNode('${item.emoji || '⭐'}'))">`;
+  }
+  return `<span class="baby-token ${size==='small'?'':'big'}">${item.emoji || item.letter || item.digit || item.name}</span>`;
+}
+
+function babyAnswerText(item, cfg=babyLevelCfg()){
+  return babyToken(item,cfg.answer).plain;
+}
+
+function babyStageHTML(prompt, hero){
+  const cat=BABY_CATEGORIES[B.category];
+  const cfg=babyLevelCfg();
+  return `
+    <section class="baby-card-stage">
+      <div class="baby-stage-top">
+        <span class="baby-badge">${BABY_ACTIVITIES[B.mode].icon} ${BABY_ACTIVITIES[B.mode].name}</span>
+        <span class="baby-mini-stat">Lv.${B.level} · ${cat.icon} ${cat.label} · Streak ${B.streak}</span>
+      </div>
+      <div class="baby-prompt">${prompt}</div>
+      <div class="baby-fill-help">${cfg.hint}</div>
+      ${hero}
+      <div id="baby-work"></div>
+      <div id="baby-result"></div>
+    </section>
+  `;
+}
+
+function babyHero(leftToken, sub){
+  const hasImg=leftToken.html.includes('baby-img');
+  return `
+    <div class="baby-hero">
+      <div class="baby-visual ${hasImg?'has-img':''}">${leftToken.html}</div>
+      <div>
+        <div class="baby-word">${leftToken.text}</div>
+        <div class="baby-subtle">${sub}</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderBabyMCQ(){
+  B.answering=false; B.pendingNext=null;
+  const cfg=babyLevelCfg();
+  const item=babyPickItem();
+  const left=babyToken(item,cfg.left);
+  const prompt=`Choose the match for ${left.text}`;
+  document.getElementById('baby-body').innerHTML=babyStageHTML(prompt, babyHero(left,'Tap the correct answer card.'));
+
+  const grid=document.createElement('div');
+  grid.className='baby-choice-grid';
+  babyChoiceSet(item).forEach(choice=>{
+    const answer=babyToken(choice,cfg.answer);
+    const btn=document.createElement('button');
+    btn.className='baby-choice';
+    btn.dataset.correct=choice===item?'1':'0';
+    btn.innerHTML=`<span class="baby-choice-ico">${answer.html}</span>`;
+    btn.onclick=()=>babyCheckMCQ(item,choice,btn,cfg);
+    grid.appendChild(btn);
+  });
+  document.getElementById('baby-work').appendChild(grid);
+}
+
+function babyCheckMCQ(correct, chosen, btn, cfg=babyLevelCfg()){
+  if(B.answering)return;
+  B.answering=true;
+  const ok=correct===chosen;
+  document.querySelectorAll('.baby-choice').forEach(b=>b.disabled=true);
+  btn.classList.add(ok?'hit':'miss');
+  if(!ok){
+    document.querySelectorAll('.baby-choice').forEach(b=>{
+      if(b.dataset.correct==='1') b.classList.add('show');
+    });
+  }
+  babyFeedback(ok, babyAnswerText(correct,cfg), ()=>renderBabyMCQ());
+}
+
+function renderBabyFill(){
+  B.answering=false; B.pendingNext=null;
+  const cfg=babyLevelCfg();
+  const item=babyPickItem();
+  const left=babyToken(item,cfg.left);
+  const answer=babyToken(item,cfg.answer);
+  const prompt=`Type the match for ${left.text}`;
+  const blank=babyFillBlank(item,cfg,answer);
+  document.getElementById('baby-body').innerHTML=babyStageHTML(prompt, babyHero(left,`Fill this: ${blank}`));
+
+  const row=document.createElement('div');
+  row.className='baby-fill-row';
+  const inp=document.createElement('input');
+  inp.className='baby-fill-input';
+  inp.type='text'; inp.maxLength=24; inp.placeholder='Try here';
+  const sub=document.createElement('button');
+  sub.className='baby-fill-submit'; sub.textContent='Check ✓';
+  const check=()=>babyCheckFill(item,cfg,inp,sub);
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')check();});
+  sub.onclick=check;
+  row.append(inp,sub);
+  document.getElementById('baby-work').appendChild(row);
+  setTimeout(()=>inp.focus(),80);
+}
+
+function babyFillBlank(item, cfg, answer){
+  if(['name','pictureName','word','scriptWord','sound'].includes(cfg.answer)){
+    return '_' + answer.plain.slice(1);
+  }
+  if(cfg.answer==='count') return 'How many stars?';
+  return '_';
+}
+
+function babyFillAnswers(item, cfg){
+  const answer=babyToken(item,cfg.answer).plain;
+  const list=[answer];
+  if(['name','pictureName','word','scriptWord','sound'].includes(cfg.answer)){
+    list.push(answer[0]);
+  }
+  if(cfg.answer==='count') list.push(item.digit, item.word);
+  if(cfg.answer==='script') list.push(item.letter);
+  if(cfg.answer==='sound') list.push(item.hint);
+  return list.map(v=>String(v).trim().toLowerCase());
+}
+
+function babyCheckFill(item, cfg, inp, sub){
+  const val=inp.value.trim().toLowerCase();
+  if(!val){ inp.focus(); return; }
+  const ok=babyFillAnswers(item,cfg).includes(val);
+  if(!ok){
+    B.streak=0;
+    inp.value='';
+    inp.style.borderColor='var(--red)';
+    inp.focus();
+    document.getElementById('baby-result').innerHTML=`
+      <div class="baby-result no"><span>💡</span><span>Try again. You can re-enter the answer.</span></div>
+    `;
+    return;
+  }
+  if(B.answering)return;
+  B.answering=true; inp.disabled=true; sub.disabled=true;
+  inp.style.borderColor='var(--green)';
+  babyFeedback(true, babyAnswerText(item,cfg), ()=>renderBabyFill());
+}
+
+function renderBabyMatch(){
+  B.answering=false; B.pendingNext=null; B.selectedLeft=null; B.matchPairs={};
+  const cfg=babyLevelCfg();
+  const left=shuffle(babyItems()).slice(0,4);
+  const right=shuffle(left);
+  B.matchLeft=left; B.matchRight=right;
+  const cat=BABY_CATEGORIES[B.category];
+  document.getElementById('baby-body').innerHTML=`
+    <section class="baby-card-stage">
+      <div class="baby-stage-top">
+        <span class="baby-badge">🧩 Match Pairs</span>
+        <span class="baby-mini-stat">Lv.${B.level} · ${cat.icon} ${cat.label} · Streak ${B.streak}</span>
+      </div>
+      <div class="baby-prompt">Tap one card from each column</div>
+      <div class="baby-fill-help">${cfg.hint}</div>
+      <div class="baby-match-grid">
+        <div class="baby-match-col" id="baby-match-left"></div>
+        <div class="baby-match-col" id="baby-match-right"></div>
+      </div>
+      <div id="baby-result"></div>
+    </section>
+  `;
+  const lc=document.getElementById('baby-match-left');
+  const rc=document.getElementById('baby-match-right');
+  left.forEach((item,i)=>{
+    const token=babyToken(item,cfg.left);
+    const tile=document.createElement('button');
+    tile.className='baby-match-tile';
+    tile.dataset.left=i;
+    tile.innerHTML=token.html;
+    tile.onclick=()=>babyMatchLeft(i);
+    lc.appendChild(tile);
+  });
+  right.forEach((item,i)=>{
+    const token=babyToken(item,cfg.answer);
+    const tile=document.createElement('button');
+    tile.className='baby-match-tile';
+    tile.dataset.right=i;
+    tile.innerHTML=token.html;
+    tile.onclick=()=>babyMatchRight(i);
+    rc.appendChild(tile);
+  });
+}
+
+function babyMatchRight(ri){
+  if(B.selectedLeft===null)return;
+  const li=B.selectedLeft;
+  if(B.matchPairs[li]!==undefined || Object.values(B.matchPairs).includes(ri))return;
+  const ok=B.matchLeft[li]===B.matchRight[ri];
+  const lEl=document.querySelector(`[data-left="${li}"]`);
+  const rEl=document.querySelector(`[data-right="${ri}"]`);
+  if(ok){
+    const pairNum=Object.keys(B.matchPairs).length;
+    const col=BABY_PAIR_COLORS[pairNum % BABY_PAIR_COLORS.length];
+    B.matchPairs[li]=ri; B.selectedLeft=null;
+    lEl.classList.remove('sel'); lEl.classList.add('done'); rEl.classList.add('done');
+    babyPaintPair(lEl,rEl,col);
+    babyRain(6);
+    if(Object.keys(B.matchPairs).length===B.matchLeft.length){
+      B.score+=20; B.streak++; save.babyXP=(save.babyXP||0)+20; persist(); babyUpdateScore();
+      document.getElementById('baby-result').innerHTML=`
+        <div class="baby-result ok"><span>🎉</span><span>All pairs matched! +20 stars</span></div>
+      `;
+      babyShowCelebrate(()=>renderBabyMatch(), 'All pairs matched!');
+    }
+  } else {
+    B.streak=0; B.selectedLeft=null;
+    lEl.classList.remove('sel'); lEl.classList.add('bad'); rEl.classList.add('bad');
+    setTimeout(()=>{ lEl.classList.remove('bad'); rEl.classList.remove('bad'); },520);
+  }
+}
+
+function babyPaintPair(leftEl, rightEl, color){
+  [leftEl,rightEl].forEach(el=>{
+    el.style.borderColor=color;
+    el.style.boxShadow=`0 0 0 3px ${babyHexToRgba(color,.2)}`;
+    el.style.background=babyHexToRgba(color,.14);
+  });
+}
+
+function babyHexToRgba(hex, alpha){
+  const n=parseInt(hex.slice(1),16);
+  const r=(n>>16)&255, g=(n>>8)&255, b=n&255;
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function babyFeedback(ok, answerText, nextFn){
+  if(ok){
+    B.score+=10; B.streak++; save.babyXP=(save.babyXP||0)+10; persist(); babyUpdateScore();
+    document.getElementById('baby-result').innerHTML=`
+      <div class="baby-result ok"><span>✅</span><span>${pickPraise()} +10 stars</span></div>
+    `;
+    babyShowCelebrate(nextFn, answerText);
+  } else {
+    B.streak=0; babyUpdateScore();
+    document.getElementById('baby-result').innerHTML=`
+      <div class="baby-result no"><span>💡</span><span>Answer: ${answerText}</span></div>
+      <button class="continue-btn c-wrong" id="baby-next-btn">Try another →</button>
+    `;
+    const btn=document.getElementById('baby-next-btn');
+    B.pendingNext=()=>{ B.pendingNext=null; nextFn(); };
+    btn.onclick=()=>babyTakeContinue();
+  }
+}
+
+function babyShowCelebrate(nextFn, message){
+  clearBabyCelebrate();
+  const yay=BABY_YAY[rnd(0,BABY_YAY.length-1)];
+  B.pendingNext=()=>{ clearBabyCelebrate(); nextFn(); };
+  const pop=document.createElement('div');
+  pop.className='baby-celebrate';
+  pop.id='baby-celebrate';
+  pop.innerHTML=`
+    <div class="baby-celebrate-box">
+      <div class="baby-celebrate-ico">🌟</div>
+      <div class="baby-celebrate-title">${yay}</div>
+      <div class="baby-celebrate-sub">${message}<br>Press Enter or tap continue</div>
+      <button class="baby-celebrate-btn" id="baby-celebrate-btn">Continue →</button>
+    </div>
+  `;
+  document.body.appendChild(pop);
+  document.getElementById('baby-celebrate-btn').onclick=()=>babyTakeContinue();
+  babyRain(20 + Math.min(50, B.streak*8));
+  confetti(14 + Math.min(30, B.streak*4));
+}
+
+function babyTakeContinue(){
+  if(!B.pendingNext)return;
+  const fn=B.pendingNext;
+  B.pendingNext=null;
+  clearBabyCelebrate();
+  fn();
+}
+
+function clearBabyCelebrate(){
+  const old=document.getElementById('baby-celebrate');
+  if(old) old.remove();
+}
+
+function babyRain(n){
+  const drops=['⭐','✨','🌈','🎈','💛','🎉'];
+  for(let i=0;i<n;i++){
+    const d=document.createElement('div');
+    d.className='baby-fall';
+    d.textContent=drops[rnd(0,drops.length-1)];
+    d.style.left=Math.random()*100+'%';
+    d.style.setProperty('--fall-dur', (1.15+Math.random()*1.4)+'s');
+    d.style.setProperty('--fall-rot', (Math.random()*720-360)+'deg');
+    d.style.animationDelay=(Math.random()*.45)+'s';
+    document.body.appendChild(d);
+    setTimeout(()=>d.remove(),3000);
+  }
+}
+
+document.addEventListener('keydown', e=>{
+  if(e.key==='Enter' && B.pendingNext && document.getElementById('baby-screen').classList.contains('active')){
+    e.preventDefault();
+    babyTakeContinue();
+  }
+});
+
+// ──────────────────────────────────────────
+// NEXT QUESTION ROUTER
+// ──────────────────────────────────────────
+function nextQ(){
+  if(G.hearts<=0){ showGameOver(); return; }
+  G.answering=false;
+  if(G.mode==='match') renderMatch();
+  else renderQCard();
+}
+
+// ──────────────────────────────────────────
+// QUESTION CARD  (MCQ / Fill)
+// ──────────────────────────────────────────
+function renderQCard(){
+  const q=genQ();
+  const body=document.getElementById('game-body');
+  body.innerHTML='';
+  const card=document.createElement('div');
+  card.className='q-stage'; card.id='qstage';
+
+  const m=OP_META[G.op];
+  card.innerHTML=`
+    <div class="q-top">
+      <span class="q-badge" style="background:${m.bg};border:1px solid ${m.border};color:${m.color}">${m.sym} ${m.name}</span>
+      <span class="q-num-lbl">Q${G.done+1} &nbsp;·&nbsp; Lv.${G.level}</span>
+    </div>
+    <div class="q-expr" id="qexpr"><span id="qtw"></span><span class="q-cursor-blink" id="qcur"></span></div>
+    <div id="qarea"></div>
+    <div id="qresult"></div>
+  `;
+  body.appendChild(card);
+  card.scrollIntoView({behavior:'smooth',block:'start'});
+
+  typeW('qtw','qcur',q.expr+' = ?',()=>{
+    if(G.mode==='mcq') buildMCQ(q);
+    else buildFill(q);
+  });
+}
+
+function typeW(tid,cid,text,cb){
+  const el=document.getElementById(tid); const cur=document.getElementById(cid);
+  let i=0; const spd=Math.max(25,70-G.level*4);
+  (function t(){if(i<text.length){el.textContent+=text[i++];setTimeout(t,spd);}else{cur&&cur.remove();cb&&cb();}})();
+}
+
+// MCQ
+function buildMCQ(q){
+  const choices=distractors(q.ans);
+  const grid=document.createElement('div'); grid.className='mcq-grid';
+  const ltrs=['A','B','C','D'];
+  choices.forEach((opt,i)=>{
+    const btn=document.createElement('button'); btn.className='mcq-btn';
+    btn.innerHTML=`<span class="opt-ltr">${ltrs[i]}</span>${opt}`;
+    btn.onclick=()=>handleMCQ(q,opt,choices,btn);
+    grid.appendChild(btn);
+  });
+  document.getElementById('qarea').appendChild(grid);
+}
+
+function handleMCQ(q,chosen,choices,btn){
+  if(G.answering)return; G.answering=true;
+  document.querySelectorAll('.mcq-btn').forEach(b=>b.disabled=true);
+  const ok=parseFloat(chosen)===parseFloat(q.ans);
+  btn.classList.add(ok?'opt-hit':'opt-miss');
+  if(!ok) document.querySelectorAll('.mcq-btn').forEach(b=>{
+    if(parseFloat(b.textContent.replace(/[A-D]/,'').trim())===parseFloat(q.ans)) b.classList.add('opt-show');
+  });
+  showResult(ok, q.ans);
+}
+
+// Fill
+function buildFill(q){
+  const wrap=document.createElement('div'); wrap.className='fill-area';
+  const inp=document.createElement('input'); inp.className='fill-inp'; inp.type='text'; inp.placeholder='?';
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')doFill(q,inp,sub);});
+  const sub=document.createElement('button'); sub.className='fill-submit'; sub.textContent='Check ✓';
+  sub.onclick=()=>doFill(q,inp,sub);
+  wrap.append(inp,sub);
+  document.getElementById('qarea').appendChild(wrap);
+  setTimeout(()=>inp.focus(),60);
+}
+function doFill(q,inp,sub){
+  if(G.answering||inp.disabled)return; G.answering=true;
+  const v=parseFloat(inp.value.trim());
+  if(isNaN(v)){inp.style.borderColor='var(--red)';inp.focus();G.answering=false;return;}
+  inp.disabled=true; sub.disabled=true;
+  const ok=Math.abs(v-q.ans)<.01;
+  inp.classList.add(ok?'inp-ok':'inp-err');
+  showResult(ok, q.ans);
+}
+
+// ──────────────────────────────────────────
+// SHOW RESULT + CONTINUE
+// ──────────────────────────────────────────
+function showResult(ok, ans){
+  const card=document.getElementById('qstage');
+  if(card){ card.classList.add(ok?'stage-correct':'stage-wrong'); }
+
+  if(ok){ G.score+=10; G.correct++; G.streak++; G.xpSession+=10; save.totalXP+=10; save.totalRight++; save.mastery[G.op]=Math.min(5,(save.mastery[G.op]||0)+0.5|0); }
+  else  { G.wrong++; G.streak=0; G.hearts--; renderHearts(); save.totalXP=Math.max(0,save.totalXP-2); }
+
+  if(G.score>save.bestScore) save.bestScore=G.score;
+  persist(); G.done++; updateGameBar(); refreshNav();
+
+  const xpPts = ok?'+10 XP':'−2 XP';
+  const rbar=document.createElement('div');
+  rbar.className='result-bar '+(ok?'r-correct':'r-wrong');
+  rbar.innerHTML=`
+    <span class="rb-ico">${ok?'✅':'❌'}</span>
+    <div class="rb-text">
+      <div class="rb-title">${ok?pickPraise():'Not quite!'}</div>
+      <div class="rb-sub">${ok?'Keep going!':'The answer was <strong>'+ans+'</strong>'}</div>
+    </div>
+    <span class="rb-pts">${xpPts}</span>
+  `;
+
+  const contBtn=document.createElement('button');
+  contBtn.className='continue-btn '+(ok?'c-correct':'c-wrong');
+  contBtn.textContent=ok?'Continue →':'Got it →';
+  contBtn.onclick=()=>nextQ();
+
+  const body=document.getElementById('game-body');
+  body.appendChild(rbar); body.appendChild(contBtn);
+  contBtn.scrollIntoView({behavior:'smooth',block:'nearest'});
+
+  if(ok&&G.streak%5===0&&G.streak>0) setTimeout(()=>showLvlUp(),400);
+  if(ok) confetti(8);
+}
+
+const PRAISE=['Brilliant!','Amazing!','Nice!','Correct!','Fantastic!','Perfect!','Spot on!','Great job!'];
+function pickPraise(){ return PRAISE[Math.floor(Math.random()*PRAISE.length)]; }
+
+// ──────────────────────────────────────────
+// MATCH THE FOLLOWING
+// ──────────────────────────────────────────
+function renderMatch(){
+  G.matchBatch++; G.matchSelLeft=null; G.matchPaired={}; G.matchCorrectMap={}; G.matchWrong=0;
+  const qs=[]; for(let i=0;i<5;i++) qs.push(genQ());
+  const rightOrder=shuffle([0,1,2,3,4]);
+  qs.forEach((_,i)=>{ G.matchCorrectMap[i]=rightOrder.indexOf(i); });
+
+  const body=document.getElementById('game-body'); body.innerHTML='';
+  const card=document.createElement('div'); card.className='q-stage'; card.id='matchcard';
+
+  const m=OP_META[G.op];
+  card.innerHTML=`
+    <div class="q-top">
+      <span class="q-badge" style="background:${m.bg};border:1px solid ${m.border};color:${m.color}">${m.sym} Match — Round ${G.matchBatch}</span>
+      <span class="q-num-lbl">Lv.${G.level}</span>
+    </div>
+    <div class="match-prompt">🔗 Tap a question, then tap its answer</div>
+    <div class="match-pairs">
+      <div class="match-left-col" id="ml-col"></div>
+      <div class="match-right-col" id="mr-col"></div>
+    </div>
+    <div id="match-result"></div>
+  `;
+  body.appendChild(card);
+  card.scrollIntoView({behavior:'smooth',block:'start'});
+
+  const lc=document.getElementById('ml-col');
+  const rc=document.getElementById('mr-col');
+
+  qs.forEach((q,i)=>{
+    const t=document.createElement('div'); t.className='match-tile'; t.dataset.li=i;
+    t.textContent=q.expr; t.onclick=()=>matchLeft(i, qs); lc.appendChild(t);
+  });
+  rightOrder.forEach((qIdx,ri)=>{
+    const t=document.createElement('div'); t.className='match-tile'; t.dataset.ri=ri;
+    t.textContent=qs[qIdx].ans; t.onclick=()=>matchRight(ri); rc.appendChild(t);
+  });
+}
+
+function matchLeft(i){
+  if(G.matchPaired[i]!==undefined)return;
+  G.matchSelLeft=i;
+  document.querySelectorAll('[data-li]').forEach(t=>t.classList.toggle('mt-sel',parseInt(t.dataset.li)===i));
+}
+
+function matchRight(ri){
+  if(G.matchSelLeft===null)return;
+  const li=G.matchSelLeft;
+  if(G.matchPaired[li]!==undefined)return;
+  const usedRights=Object.values(G.matchPaired);
+  if(usedRights.includes(ri))return;
+
+  const ok=G.matchCorrectMap[li]===ri;
+  const lEl=document.querySelector(`[data-li="${li}"]`);
+  const rEl=document.querySelector(`[data-ri="${ri}"]`);
+
+  if(ok){
+    const colors=['#22c55e','#facc15','#38bdf8','#d946ef','#f97316'];
+    const col=colors[Object.keys(G.matchPaired).length];
+    G.matchPaired[li]=ri;
+    lEl.classList.remove('mt-sel'); lEl.classList.add('mt-done');
+    rEl.classList.add('mt-done');
+    lEl.style.borderColor=rEl.style.borderColor=col;
+    lEl.style.color=rEl.style.color=col;
+    lEl.style.background=rEl.style.background=col.replace('#','rgba(').replace(')',', .12)').replace('rgba(','rgba(#').replace('rgba(#','rgba(')+')';
+    G.matchSelLeft=null;
+    confetti(4);
+
+    if(Object.keys(G.matchPaired).length===5){
+      const pts=G.matchWrong===0?60:G.matchWrong<3?40:20;
+      G.score+=pts; G.xpSession+=pts; G.correct+=5;
+      save.totalXP+=pts; save.totalRight+=5; persist();
+      G.done+=5; updateGameBar(); refreshNav();
+      const res=document.getElementById('match-result');
+      res.innerHTML=`
+        <div class="result-bar ${G.matchWrong===0?'r-correct':'r-wrong'}" style="margin-top:16px">
+          <span class="rb-ico">${G.matchWrong===0?'🎉':'👍'}</span>
+          <div class="rb-text">
+            <div class="rb-title">${G.matchWrong===0?'Perfect Round!':'Round Complete!'}</div>
+            <div class="rb-sub">${G.matchWrong===0?'All 5 pairs matched!':G.matchWrong+' mistake(s)'}</div>
+          </div>
+          <span class="rb-pts">+${pts} XP</span>
+        </div>
+        <button class="continue-btn c-correct" style="margin-top:10px" onclick="nextQ()">Next Round →</button>
+      `;
+      res.scrollIntoView({behavior:'smooth',block:'nearest'});
+      if(G.matchWrong===0) confetti(20);
+    }
+  } else {
+    G.matchWrong++;
+    lEl.classList.remove('mt-sel');
+    lEl.classList.add('mt-wrong'); rEl.classList.add('mt-wrong');
+    G.matchSelLeft=null;
+    G.hearts--; renderHearts(); refreshNav();
+    setTimeout(()=>{ lEl.classList.remove('mt-wrong'); rEl.classList.remove('mt-wrong'); },500);
+  }
+}
+
+// ──────────────────────────────────────────
+// GAME OVER
+// ──────────────────────────────────────────
+function showGameOver(){
+  const body=document.getElementById('game-body'); body.innerHTML='';
+  const card=document.createElement('div'); card.className='q-stage';
+  card.style.textAlign='center'; card.style.padding='40px 24px';
+  card.innerHTML=`
+    <div style="font-size:3.5rem;margin-bottom:12px">💀</div>
+    <div style="font-family:var(--font-head);font-size:1.8rem;font-weight:800;color:#f87171;margin-bottom:8px">Out of Hearts!</div>
+    <div style="color:var(--p5);font-size:.9rem;margin-bottom:24px">Session score: <strong style="color:var(--gold)">${G.score}</strong></div>
+    <button class="continue-btn c-wrong" style="max-width:280px;margin:0 auto" onclick="restartSame()">🔄 Try Again</button>
+    <br><br>
+    <button class="continue-btn c-correct" style="max-width:280px;margin:0 auto" onclick="goHome()">🏠 Home</button>
+  `;
+  body.appendChild(card);
+  save.bestScore=Math.max(save.bestScore,G.score); persist();
+}
+function restartSame(){ G.hearts=5; G.score=0; G.correct=0; G.wrong=0; G.streak=0; G.xpSession=0; G.done=0; G.matchBatch=0; refreshNav(); renderHearts(); updateGameBar(); document.getElementById('game-body').innerHTML=''; nextQ(); }
+
+// ──────────────────────────────────────────
+// LEVEL UP SPLASH
+// ──────────────────────────────────────────
+function showLvlUp(){
+  if(G.level>=10)return;
+  const splash=document.createElement('div'); splash.className='lvlup-splash';
+  splash.innerHTML=`
+    <div class="lvlup-box">
+      <span class="lvlup-ico">🏆</span>
+      <div class="lvlup-title">Level Up!</div>
+      <div class="lvlup-sub">You're on a ${G.streak} streak! Level ${G.level} → ${G.level+1}</div>
+      <button class="lvlup-ok" onclick="this.closest('.lvlup-splash').remove();G.level++;buildLvDropdown();refreshNav();showToast('Level '+G.level+'!')">Sweet! →</button>
+    </div>
+  `;
+  document.body.appendChild(splash);
+  confetti(30);
+}
+
+// ──────────────────────────────────────────
+// TOAST
+// ──────────────────────────────────────────
+function showToast(msg){
+  const t=document.createElement('div'); t.className='toast'; t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transition='opacity .3s'; setTimeout(()=>t.remove(),350); },1800);
+}
+
+// ──────────────────────────────────────────
+// CONFETTI
+// ──────────────────────────────────────────
+function confetti(n){
+  const cl=['#a855f7','#facc15','#22c55e','#38bdf8','#fb7185','#fff'];
+  for(let i=0;i<n;i++){
+    const p=document.createElement('div'); p.className='conf';
+    const w=5+Math.random()*8; const h=6+Math.random()*10;
+    const r=Math.random()*720-360;
+    p.style.cssText=`left:${Math.random()*100}%;top:-10px;width:${w}px;height:${h}px;background:${cl[rnd(0,cl.length-1)]};border-radius:${Math.random()<.4?'50%':'2px'};--r:${r}deg;animation:confFall ${.7+Math.random()*1.1}s ease ${Math.random()*.3}s forwards;`;
+    document.body.appendChild(p); setTimeout(()=>p.remove(),2000);
+  }
+}
+
+// ──────────────────────────────────────────
+// INIT
+// ──────────────────────────────────────────
+refreshHome();
+</script>
+</body>
+</html>
